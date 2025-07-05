@@ -1,644 +1,640 @@
 <!DOCTYPE html>
-<html lang="en" >
+<html lang="en">
 <head>
-  <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
-  <title>Internal Affairs — iPhone Style Dashboard</title>
-  <style>
-    /* iOS Inspired system fonts */
-    body {
-      margin: 0; 
-      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Oxygen,
-        Ubuntu, Cantarell, "Open Sans", "Helvetica Neue", sans-serif;
-      background: #f2f2f7;
-      color: #1c1c1e;
-      -webkit-font-smoothing: antialiased;
-      -moz-osx-font-smoothing: grayscale;
-      line-height: 1.45;
-      min-height: 100vh;
-      display: flex;
-      flex-direction: column;
-      align-items: center;
-      padding: env(safe-area-inset-top) 1rem 3rem;
-    }
-    h1, h2, h3 {
-      font-weight: 600;
-      margin: 1rem 0 0.5rem;
-      letter-spacing: -0.015em;
-      color: #1c1c1e;
-    }
-    h1 {
-      font-size: 1.8rem;
-      text-align: center;
-    }
-    h2 {
-      font-size: 1.3rem;
-    }
-    h3 {
-      font-size: 1.1rem;
-    }
-    /* Card container */
-    section {
-      background: white;
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>Internal Affairs Dashboard — Advanced Red Theme</title>
+<style>
+  /* Fonts & Reset */
+  *, *::before, *::after {
+    box-sizing: border-box;
+  }
+  body {
+    margin: 0; font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto,
+      Oxygen, Ubuntu, Cantarell, "Open Sans", "Helvetica Neue", sans-serif;
+    background: #fff5f5;
+    color: #3a0b0b;
+    line-height: 1.5;
+    min-height: 100vh;
+    padding: 1rem;
+  }
+  h1, h2 {
+    color: #8b0000;
+    margin-bottom: 0.3rem;
+  }
+  h1 {
+    font-size: 2rem;
+    text-align: center;
+    font-weight: 700;
+  }
+  h2 {
+    font-size: 1.4rem;
+    border-bottom: 2px solid #b22222;
+    padding-bottom: 0.2rem;
+  }
+  .container {
+    max-width: 900px;
+    margin: 0 auto 3rem;
+    background: #ffe5e5;
+    border-radius: 15px;
+    padding: 1.5rem 2rem;
+    box-shadow: 0 4px 15px rgba(139,0,0,0.25);
+  }
+  /* Buttons */
+  button {
+    cursor: pointer;
+    background-color: #b22222;
+    color: white;
+    border: none;
+    padding: 0.6rem 1.2rem;
+    font-size: 1rem;
+    border-radius: 10px;
+    transition: background-color 0.3s ease;
+    user-select: none;
+  }
+  button:hover {
+    background-color: #8b0000;
+  }
+  /* Inputs */
+  input[type="text"], input[type="date"], select, textarea {
+    font-size: 1rem;
+    padding: 0.4rem 0.6rem;
+    border-radius: 8px;
+    border: 1.5px solid #b22222;
+    width: 100%;
+    margin-top: 0.3rem;
+    margin-bottom: 1rem;
+    outline-offset: 2px;
+  }
+  input[type="checkbox"] {
+    transform: scale(1.3);
+    margin-right: 0.5rem;
+    cursor: pointer;
+  }
+  label {
+    font-weight: 600;
+  }
+  /* Progress Bar */
+  .progress-container {
+    background: #f9d6d6;
+    border-radius: 20px;
+    height: 25px;
+    overflow: hidden;
+    margin-bottom: 1rem;
+    box-shadow: inset 0 2px 4px #aa4b4b;
+  }
+  .progress-bar {
+    background: #b22222;
+    height: 100%;
+    width: 0%;
+    transition: width 0.5s ease-in-out;
+    border-radius: 20px 0 0 20px;
+  }
+  .progress-text {
+    text-align: center;
+    font-weight: 700;
+    margin-bottom: 1rem;
+    color: #660000;
+    font-size: 1.1rem;
+  }
+  /* Table styles */
+  table {
+    width: 100%;
+    border-collapse: separate;
+    border-spacing: 0 12px;
+  }
+  thead tr {
+    background-color: #8b0000;
+    color: white;
+    font-weight: 700;
+    border-radius: 12px;
+  }
+  thead th {
+    padding: 0.8rem 0.5rem;
+    text-align: left;
+  }
+  tbody tr {
+    background: #fff0f0;
+    border-radius: 12px;
+    box-shadow: 0 2px 8px rgba(178,34,34,0.15);
+  }
+  tbody td {
+    padding: 0.8rem 0.5rem;
+    vertical-align: middle;
+  }
+  tbody td button {
+    background: #cc4444;
+    font-size: 0.9rem;
+    padding: 0.3rem 0.8rem;
+    border-radius: 8px;
+  }
+  tbody td button:hover {
+    background: #a53030;
+  }
+  /* Badge styles */
+  .badge {
+    padding: 0.3rem 0.7rem;
+    border-radius: 15px;
+    font-weight: 700;
+    color: white;
+    display: inline-block;
+    min-width: 80px;
+    text-align: center;
+    user-select: none;
+  }
+  .open { background: #dc3545; }      /* Bootstrap Danger Red */
+  .pending { background: #fd7e14; }   /* Orange */
+  .resolved { background: #28a745; }  /* Green */
+  .closed { background: #6c757d; }    /* Gray */
+  .overdue { background: #b22222; }
+  .followup { background: #c82333; }
+  /* Responsive layout */
+  @media (max-width: 650px) {
+    table, thead, tbody, tr, th, td {
+      display: block;
       width: 100%;
-      max-width: 600px;
-      margin: 1rem auto;
-      border-radius: 20px;
-      box-shadow: 0 2px 14px rgba(0,0,0,0.1);
-      padding: 1.2rem 1.5rem;
-      box-sizing: border-box;
-    }
-    /* Progress Circle */
-    .progress-circle {
-      position: relative;
-      width: 140px;
-      height: 140px;
-      margin: 0 auto 1rem auto;
-    }
-    .progress-circle svg {
-      transform: rotate(-90deg);
-      width: 140px;
-      height: 140px;
-    }
-    .progress-bg {
-      fill: none;
-      stroke: #e5e5ea;
-      stroke-width: 12;
-    }
-    .progress-bar {
-      fill: none;
-      stroke: #34c759;
-      stroke-width: 12;
-      stroke-linecap: round;
-      stroke-dasharray: 440;
-      stroke-dashoffset: 0; /* Will be set inline */
-      transition: stroke-dashoffset 0.6s ease;
-    }
-    .progress-text {
-      position: absolute;
-      top: 50%;
-      left: 50%;
-      font-weight: 700;
-      font-size: 1.5rem;
-      color: #1c1c1e;
-      transform: translate(-50%, -50%);
-      user-select: none;
-    }
-    /* Case Table */
-    table {
-      width: 100%;
-      border-collapse: separate;
-      border-spacing: 0 0.5rem;
     }
     thead tr {
-      display: none; /* Hidden on mobile iPhone style */
+      display: none;
     }
     tbody tr {
-      background: #f9fafb;
+      margin-bottom: 1.2rem;
       border-radius: 15px;
-      box-shadow: inset 0 0 0 1px #d1d1d6;
-      display: flex;
-      flex-direction: column;
-      padding: 1rem 1rem 0.75rem;
-    }
-    tbody tr + tr {
-      margin-top: 1rem;
+      box-shadow: 0 3px 15px rgba(178,34,34,0.3);
+      background: #ffe5e5;
+      padding: 1rem;
     }
     tbody td {
-      display: flex;
-      justify-content: space-between;
-      padding: 0.1rem 0;
-      font-size: 0.95rem;
-      font-weight: 500;
-      border: none;
-      color: #3c3c4399;
-    }
-    tbody td:first-child {
-      font-weight: 700;
-      color: #1c1c1e;
-      margin-bottom: 0.3rem;
-      font-size: 1rem;
-    }
-    /* Status badges */
-    .badge {
-      padding: 0.15em 0.7em;
-      border-radius: 14px;
-      font-weight: 600;
-      font-size: 0.85rem;
-      display: inline-block;
-      min-width: 75px;
-      text-align: center;
-      color: white;
-      user-select: none;
-      box-shadow: 0 1px 2px rgba(0,0,0,0.12);
-    }
-    .badge-open { background-color: #ff3b30; }       /* red */
-    .badge-pending { background-color: #ff9500; }    /* orange */
-    .badge-resolved { background-color: #34c759; }   /* green */
-    .badge-closed { background-color: #8e8e93; }     /* gray */
-    .badge-overdue { background-color: #ff453a; }
-    .badge-followup { background-color: #0a84ff; }   /* blue */
-    .badge-top-performer { background-color: #fbcf3f; color: #3c3c43; }
-    /* Follow up checkbox */
-    .checkbox {
-      margin: 0 0.5rem 0 0;
-      accent-color: #0a84ff;
-      cursor: default;
-    }
-    /* Section titles & small note */
-    .note {
-      font-size: 0.8rem;
-      color: #6e6e73;
-      margin-top: 0.5rem;
-    }
-    /* Case breakdown */
-    .case-breakdown {
-      display: grid;
-      grid-template-columns: 1fr 100px;
-      gap: 0.5rem 1rem;
-      margin-top: 0.5rem;
-    }
-    .case-breakdown-label {
-      font-weight: 600;
-      font-size: 1rem;
-      color: #1c1c1e;
-      align-self: center;
-    }
-    .bar-wrapper {
-      background: #e5e5ea;
-      border-radius: 14px;
-      height: 18px;
-      overflow: hidden;
+      padding: 0.3rem 0;
       position: relative;
-      box-shadow: inset 0 1px 2px rgba(0,0,0,0.1);
-    }
-    .bar-fill {
-      height: 100%;
-      background: #34c759;
-      border-radius: 14px 0 0 14px;
-      transition: width 0.3s ease;
-    }
-    /* Officer Performance */
-    .performance-table {
-      width: 100%;
-      border-collapse: separate;
-      border-spacing: 0 1rem;
-    }
-    .performance-table thead tr {
-      background: transparent;
-      display: flex;
-      font-weight: 700;
-      font-size: 0.95rem;
-      color: #1c1c1e;
-      padding-bottom: 0.3rem;
-      border-bottom: 2px solid #c7c7cc;
-      margin-bottom: 0.75rem;
-    }
-    .performance-table tbody tr {
-      display: flex;
-      background: #f9fafb;
-      border-radius: 15px;
-      padding: 0.5rem 1rem;
-      align-items: center;
-      box-shadow: inset 0 0 0 1px #d1d1d6;
-      font-weight: 600;
-      font-size: 0.9rem;
-      color: #3c3c43;
-    }
-    .performance-table th, .performance-table td {
-      flex: 1;
+      padding-left: 45%;
       text-align: left;
-    }
-    .performance-table td.efficiency {
-      flex: 2;
-      display: flex;
-      align-items: center;
-      gap: 0.6rem;
-    }
-    .performance-bar {
-      flex-grow: 1;
-      height: 12px;
-      background: #e5e5ea;
-      border-radius: 14px;
-      overflow: hidden;
-      box-shadow: inset 0 1px 2px rgba(0,0,0,0.1);
-    }
-    .performance-bar-fill {
-      background: #0a84ff;
-      height: 100%;
-      border-radius: 14px 0 0 14px;
-      transition: width 0.3s ease;
-    }
-    /* File links */
-    .file-list {
-      list-style: none;
-      padding-left: 0;
-      margin: 0;
-    }
-    .file-list li {
-      margin-bottom: 0.8rem;
       font-weight: 600;
+      border-bottom: 1px solid #b22222;
     }
-    .file-list a {
-      color: #0a84ff;
-      text-decoration: none;
-    }
-    .file-list a:hover,
-    .file-list a:focus {
-      text-decoration: underline;
-    }
-    /* Follow-up table */
-    .followup-table {
-      width: 100%;
-      border-collapse: separate;
-      border-spacing: 0 0.8rem;
-    }
-    .followup-table thead tr {
-      display: flex;
+    tbody td::before {
+      content: attr(data-label);
+      position: absolute;
+      left: 0.8rem;
+      top: 50%;
+      transform: translateY(-50%);
       font-weight: 700;
-      font-size: 0.95rem;
-      border-bottom: 2px solid #c7c7cc;
-      margin-bottom: 0.5rem;
-      color: #1c1c1e;
+      color: #8b0000;
+      white-space: nowrap;
     }
-    .followup-table tbody tr {
-      display: flex;
-      background: #f9fafb;
-      border-radius: 15px;
-      box-shadow: inset 0 0 0 1px #d1d1d6;
-      padding: 0.5rem 1rem;
-      font-weight: 600;
-      font-size: 0.9rem;
-      color: #3c3c43;
-      align-items: center;
-    }
-    .followup-table th,
-    .followup-table td {
-      flex: 1;
-      text-align: left;
-    }
-    /* Summary */
-    .summary-table {
-      width: 100%;
-      border-collapse: collapse;
-      font-weight: 600;
-      font-size: 1rem;
-      color: #1c1c1e;
-    }
-    .summary-table th, .summary-table td {
-      padding: 0.5rem 0.75rem;
-      border-bottom: 1px solid #d1d1da;
-      text-align: left;
-    }
-    .summary-table th {
-      width: 50%;
-      font-weight: 700;
-    }
-    .summary-badge {
-      background: #fbcf3f;
-      color: #3c3c43;
-      padding: 0.3em 0.6em;
-      border-radius: 15px;
-      font-weight: 700;
-      display: inline-block;
-      box-shadow: 0 1px 2px rgba(0,0,0,0.12);
-    }
-    /* Buttons - placeholders for future JS actions */
-    button {
-      background: #0a84ff;
-      color: white;
-      border: none;
-      border-radius: 14px;
-      padding: 0.6rem 1.2rem;
-      font-weight: 600;
-      font-size: 1rem;
-      box-shadow: 0 2px 10px rgb(10 132 255 / 0.4);
-      cursor: pointer;
-      user-select: none;
-      transition: background 0.3s ease;
-      margin-top: 1rem;
+    tbody td button {
+      margin-top: 0.8rem;
       width: 100%;
     }
-    button:hover,
-    button:focus {
-      background: #0066ff;
-      outline: none;
-    }
-    /* Responsive */
-    @media (min-width: 600px) {
-      tbody tr {
-        display: table-row;
-        background: white;
-        box-shadow: none;
-        border-radius: 0;
-        padding: 0;
-      }
-      thead tr {
-        display: table-row;
-      }
-      tbody td {
-        padding: 0.75rem 1rem;
-        display: table-cell;
-        color: #24292e;
-        font-weight: 400;
-        border-bottom: 1px solid #d1d5da;
-      }
-      tbody td:first-child {
-        font-weight: 600;
-        color: #24292e;
-      }
-      /* Flex based performance table to normal */
-      .performance-table, .followup-table {
-        display: table;
-      }
-      .performance-table thead tr, .followup-table thead tr,
-      .performance-table tbody tr, .followup-table tbody tr {
-        display: table-row;
-      }
-      .performance-table th, .followup-table th,
-      .performance-table td, .followup-table td {
-        display: table-cell;
-        padding: 0.5rem 1rem;
-        color: #24292e;
-        font-weight: 400;
-        text-align: left;
-      }
-      .performance-table td.efficiency {
-        display: flex;
-        align-items: center;
-        gap: 0.6rem;
-      }
-      .performance-bar {
-        flex-grow: 1;
-        height: 12px;
-        margin-left: 0.5rem;
-      }
-      /* File list as table */
-      .file-list {
-        display: table;
-        width: 100%;
-      }
-      .file-list li {
-        display: table-row;
-        font-weight: 400;
-      }
-      .file-list li > a {
-        display: table-cell;
-        padding: 0.5rem 1rem;
-      }
-    }
-  </style>
+  }
+  /* Form section */
+  form {
+    background: #ffe5e5;
+    border-radius: 15px;
+    padding: 1rem 1.5rem;
+    box-shadow: inset 0 0 10px #b22222;
+    margin-top: 1.5rem;
+  }
+  form > div {
+    margin-bottom: 1rem;
+  }
+  /* Officer list */
+  .officer-list {
+    margin-top: 1rem;
+    padding: 0;
+    list-style: none;
+  }
+  .officer-list li {
+    background: #b22222;
+    color: white;
+    margin-bottom: 0.6rem;
+    padding: 0.4rem 0.7rem;
+    border-radius: 12px;
+    font-weight: 600;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+  }
+  .officer-list li button {
+    background: #8b0000;
+    font-size: 0.8rem;
+    padding: 0.2rem 0.5rem;
+  }
+  /* Bar chart for breakdown */
+  .breakdown {
+    margin-top: 1rem;
+  }
+  .breakdown-item {
+    margin-bottom: 0.8rem;
+  }
+  .breakdown-label {
+    font-weight: 700;
+    margin-bottom: 0.2rem;
+    color: #660000;
+  }
+  .breakdown-bar {
+    height: 20px;
+    background: #b22222;
+    border-radius: 12px;
+    width: 0;
+    transition: width 0.5s ease;
+  }
+  /* Alerts */
+  .alert {
+    background: #ffe0e0;
+    border: 1.5px solid #b22222;
+    color: #660000;
+    padding: 0.6rem 1rem;
+    border-radius: 12px;
+    font-weight: 700;
+    margin-bottom: 1rem;
+  }
+  /* Footer */
+  footer {
+    text-align: center;
+    color: #8b0000;
+    font-size: 0.85rem;
+    margin-top: 3rem;
+  }
+</style>
 </head>
 <body>
 
-<header>
-  <h1>🕵️ Internal Affairs Case Tracker</h1>
-  <p style="text-align:center; color:#6e6e73; font-size:0.85rem;">iPhone-style clean dashboard — manual updates only (no JS)</p>
-</header>
+  <h1>🕵️‍♂️ Internal Affairs Dashboard</h1>
 
-<section aria-labelledby="progress">
-  <h2 id="progress">📊 Progress Overview</h2>
-  <!--
-    Update stroke-dashoffset inline style on .progress-bar to (440 * (1 - completed/total))
-    Example: completed=14, total=20 → offset = 440 * (1 - 14/20) = 132
-  -->
-  <div class="progress-circle" role="progressbar" aria-valuemin="0" aria-valuemax="20" aria-valuenow="14" aria-label="Cases completion progress">
-    <svg viewBox="0 0 140 140" aria-hidden="true" focusable="false">
-      <circle class="progress-bg" cx="70" cy="70" r="70" />
-      <circle class="progress-bar" cx="70" cy="70" r="70" style="stroke-dashoffset: 132;" />
-    </svg>
-    <div class="progress-text" aria-live="polite">14 / 20</div>
-  </div>
-  <p class="note">Update progress-circle stroke offset and text to reflect current progress.</p>
-</section>
-
-<section aria-labelledby="cases">
-  <h2 id="cases">🗂️ Cases</h2>
-  <!-- 
-    Using <details> and <summary> for tappable expand/collapse per case (mobile friendly)
-    Can add "Add new case" button below as placeholder for future JS or manual editing instructions
-  -->
-  <details open>
-    <summary>
-      <strong>IA-001</strong> - Abuse of Power
-      <span class="badge badge-open" aria-label="Open status">🔴 Open</span>
-    </summary>
-    <div style="padding: 0.8rem 0 0 0;">
-      <p><strong>Assigned Officer:</strong> Officer Jane Doe</p>
-      <p><strong>Due Date:</strong> 2025-07-10</p>
-      <p><strong>Follow-up Needed:</strong> <input type="checkbox" checked disabled class="checkbox" aria-label="Follow-up needed for IA-001"></p>
-      <p><strong>Overdue Alert:</strong> <span class="badge badge-overdue">⚠️ Yes</span></p>
-      <p><strong>Notes:</strong> Awaiting witness statement</p>
-      <p><strong>Files:</strong> <a href="./files/Transcript_IA001.pdf" target="_blank" rel="noopener noreferrer">Transcript_IA001.pdf</a></p>
-    </div>
-  </details>
-  <details>
-    <summary>
-      <strong>IA-002</strong> - Misconduct
-      <span class="badge badge-closed" aria-label="Closed status">✅ Closed</span>
-    </summary>
-    <div style="padding: 0.8rem 0 0 0;">
-      <p><strong>Assigned Officer:</strong> Officer John Smith</p>
-      <p><strong>Due Date:</strong> 2025-06-28</p>
-      <p><strong>Follow-up Needed:</strong> <input type="checkbox" disabled class="checkbox" aria-label="No follow-up for IA-002"></p>
-      <p><strong>Overdue Alert:</strong> ❌ No</p>
-      <p><strong>Files:</strong> <a href="./files/Evidence_IA002.zip" target="_blank" rel="noopener noreferrer">Evidence_IA002.zip</a></p>
-    </div>
-  </details>
-  <details>
-    <summary>
-      <strong>IA-003</strong> - Corruption
-      <span class="badge badge-pending" aria-label="Pending status">🟡 Pending</span>
-    </summary>
-    <div style="padding: 0.8rem 0 0 0;">
-      <p><strong>Assigned Officer:</strong> Officer Alice Chen</p>
-      <p><strong>Due Date:</strong> 2025-07-12</p>
-      <p><strong>Follow-up Needed:</strong> <input type="checkbox" checked disabled class="checkbox" aria-label="Follow-up needed for IA-003"></p>
-      <p><strong>Overdue Alert:</strong> ❌ No</p>
-      <p><strong>Notes:</strong> Officer report pending</p>
-      <p><strong>Files:</strong> <a href="./files/Transcript_IA003.pdf" target="_blank" rel="noopener noreferrer">Transcript_IA003.pdf</a></p>
-    </div>
-  </details>
-  <button aria-label="Add new case">＋ Add New Case (manual edit)</button>
-  <p class="note">Cases listed above. Use &lt;details&gt; to expand each case details.</p>
-</section>
-
-<section aria-labelledby="case-breakdown">
-  <h2 id="case-breakdown">📈 Case Breakdown by Type</h2>
-  <div class="case-breakdown" role="list">
-    <!-- Update bar widths inline style for each .bar-fill -->
-    <div class="case-breakdown-label" role="listitem">Abuse of Power</div>
-    <div class="bar-wrapper" role="listitem" aria-label="Abuse of Power case count">
-      <div class="bar-fill" style="width: 70%;"></div>
-    </div>
-
-    <div class="case-breakdown-label" role="listitem">Misconduct</div>
-    <div class="bar-wrapper" role="listitem" aria-label="Misconduct case count">
-      <div class="bar-fill" style="width: 40%; background: #ff9500;"></div>
-    </div>
-
-    <div class="case-breakdown-label" role="listitem">Corruption</div>
-    <div class="bar-wrapper" role="listitem" aria-label="Corruption case count">
-      <div class="bar-fill" style="width: 30%; background: #ff3b30;"></div>
-    </div>
-
-    <div class="case-breakdown-label" role="listitem">Other</div>
-    <div class="bar-wrapper" role="listitem" aria-label="Other case count">
-      <div class="bar-fill" style="width: 15%; background: #8e8e93;"></div>
+  <div class="container" aria-label="Progress overview">
+    <h2>Progress Overview</h2>
+    <div class="progress-text" id="progress-text">Loading progress...</div>
+    <div class="progress-container" role="progressbar" aria-valuemin="0" aria-valuemax="100" aria-valuenow="0" aria-label="Case completion progress">
+      <div class="progress-bar" id="progress-bar"></div>
     </div>
   </div>
-  <p class="note">Adjust bar widths and colors to match your current case distribution.</p>
-</section>
 
-<section aria-labelledby="officer-performance">
-  <h2 id="officer-performance">👮 Officer Performance</h2>
-  <table class="performance-table" role="table" aria-describedby="performance-desc">
-    <caption id="performance-desc" class="sr-only">Table of officers with assigned, completed tasks and efficiency rating</caption>
-    <thead>
-      <tr>
-        <th scope="col">Officer</th>
-        <th scope="col">Assigned</th>
-        <th scope="col">Completed</th>
-        <th scope="col">Efficiency</th>
-      </tr>
-    </thead>
-    <tbody>
-      <tr>
-        <td>Jane Doe</td>
-        <td>8</td>
-        <td>6</td>
-        <td class="efficiency" aria-label="Efficiency 75%">
-          <span>75%</span>
-          <div class="performance-bar" aria-hidden="true">
-            <div class="performance-bar-fill" style="width: 75%;"></div>
-          </div>
-        </td>
-      </tr>
-      <tr>
-        <td>John Smith</td>
-        <td>7</td>
-        <td>7</td>
-        <td class="efficiency" aria-label="Efficiency 100%">
-          <span>100%</span>
-          <div class="performance-bar" aria-hidden="true">
-            <div class="performance-bar-fill" style="width: 100%;"></div>
-          </div>
-        </td>
-      </tr>
-      <tr>
-        <td>Alice Chen</td>
-        <td>5</td>
-        <td>3</td>
-        <td class="efficiency" aria-label="Efficiency 60%">
-          <span>60%</span>
-          <div class="performance-bar" aria-hidden="true">
-            <div class="performance-bar-fill" style="width: 60%;"></div>
-          </div>
-        </td>
-      </tr>
-    </tbody>
-  </table>
-  <p class="note">Update efficiency bars and numbers monthly.</p>
-</section>
+  <div class="container" aria-label="Cases management">
+    <h2>Cases</h2>
+    <table aria-describedby="cases-desc" aria-live="polite" id="cases-table" role="table">
+      <caption id="cases-desc" class="sr-only">List of Internal Affairs cases with details</caption>
+      <thead>
+        <tr>
+          <th scope="col">Case ID</th>
+          <th scope="col">Type</th>
+          <th scope="col">Status</th>
+          <th scope="col">Assigned Officer</th>
+          <th scope="col">Due Date</th>
+          <th scope="col">Follow-up</th>
+          <th scope="col" style="width: 100px;">Actions</th>
+        </tr>
+      </thead>
+      <tbody id="cases-tbody">
+        <!-- Rows populated by JS -->
+      </tbody>
+    </table>
 
-<section aria-labelledby="file-attachments">
-  <h2 id="file-attachments">📎 File Attachments</h2>
-  <ul class="file-list">
-    <!-- Add new files as list items -->
-    <li><a href="./files/Transcript_IA001.pdf" target="_blank" rel="noopener noreferrer">Transcript for IA-001</a></li>
-    <li><a href="./files/Evidence_IA002.zip" target="_blank" rel="noopener noreferrer">Evidence Archive for IA-002</a></li>
-    <li><a href="./files/Transcript_IA003.pdf" target="_blank" rel="noopener noreferrer">Transcript for IA-003</a></li>
-  </ul>
-  <p class="note">Add or remove files as needed, updating links accordingly.</p>
-</section>
+    <form id="case-form" aria-label="Add or update a case">
+      <h3 id="form-title">Add New Case</h3>
+      <input type="hidden" id="edit-index" value="-1" />
+      <div>
+        <label for="case-id">Case ID</label>
+        <input type="text" id="case-id" placeholder="E.g. IA-010" required maxlength="10" />
+      </div>
+      <div>
+        <label for="case-type">Type</label>
+        <select id="case-type" required>
+          <option value="">Select type</option>
+          <option value="Abuse of Power">Abuse of Power</option>
+          <option value="Misconduct">Misconduct</option>
+          <option value="Corruption">Corruption</option>
+          <option value="Other">Other</option>
+        </select>
+      </div>
+      <div>
+        <label for="case-status">Status</label>
+        <select id="case-status" required>
+          <option value="">Select status</option>
+          <option value="Open">Open</option>
+          <option value="Pending">Pending</option>
+          <option value="Resolved">Resolved</option>
+          <option value="Closed">Closed</option>
+        </select>
+      </div>
+      <div>
+        <label for="case-officer">Assigned Officer</label>
+        <input type="text" id="case-officer" placeholder="Officer name" required maxlength="30" />
+      </div>
+      <div>
+        <label for="case-due">Due Date</label>
+        <input type="date" id="case-due" required />
+      </div>
+      <div>
+        <label><input type="checkbox" id="case-followup" /> Follow-up Required</label>
+      </div>
+      <button type="submit" id="form-submit">Add Case</button>
+      <button type="button" id="form-cancel" style="display:none; margin-left: 10px; background:#660000;">Cancel Edit</button>
+    </form>
+  </div>
 
-<section aria-labelledby="followup-overdue">
-  <h2 id="followup-overdue">⚠️ Follow-ups & Overdue Cases</h2>
-  <table class="followup-table" role="table" aria-describedby="followup-desc">
-    <caption id="followup-desc" class="sr-only">Table of cases requiring follow-up or overdue alerts</caption>
-    <thead>
-      <tr>
-        <th scope="col">Case ID</th>
-        <th scope="col">Follow-up</th>
-        <th scope="col">Days Overdue</th>
-        <th scope="col">Notes</th>
-      </tr>
-    </thead>
-    <tbody>
-      <tr>
-        <td>IA-003</td>
-        <td><input type="checkbox" checked disabled class="checkbox" aria-label="Follow-up needed for IA-003" /></td>
-        <td>3</td>
-        <td>Awaiting witness statement</td>
-      </tr>
-      <tr>
-        <td>IA-005</td>
-        <td><input type="checkbox" checked disabled class="checkbox" aria-label="Follow-up needed for IA-005" /></td>
-        <td>7</td>
-        <td>Officer report pending</td>
-      </tr>
-    </tbody>
-  </table>
-  <p class="note">Update overdue days and notes as cases progress.</p>
-</section>
+  <div class="container" aria-label="Case type breakdown">
+    <h2>Case Breakdown by Type</h2>
+    <div id="breakdown-container" class="breakdown" aria-live="polite" aria-atomic="true">
+      <!-- Bar charts populated by JS -->
+    </div>
+  </div>
 
-<section aria-labelledby="summary">
-  <h2 id="summary">📅 End-of-Month Summary — <time datetime="2025-07">July 2025</time></h2>
-  <table class="summary-table" role="table" aria-describedby="summary-desc">
-    <caption id="summary-desc" class="sr-only">Summary of key statistics for the month</caption>
-    <tbody>
-      <tr>
-        <th scope="row">Total Cases</th>
-        <td>20</td>
-      </tr>
-      <tr>
-        <th scope="row">Resolved Cases</th>
-        <td>14</td>
-      </tr>
-      <tr>
-        <th scope="row">Ongoing Cases</th>
-        <td>6</td>
-      </tr>
-      <tr>
-        <th scope="row">Average Resolution Time</th>
-        <td>12 days</td>
-      </tr>
-      <tr>
-        <th scope="row">Top Performers</th>
-        <td><span class="summary-badge" aria-label="Top performer badge">John Smith 🏆, Jane Doe ✅</span></td>
-      </tr>
-    </tbody>
-  </table>
-  <p class="note">Update this summary at the end of each month.</p>
-</section>
+  <div class="container" aria-label="Officer management">
+    <h2>Officers</h2>
+    <ul id="officer-list" class="officer-list" aria-live="polite" aria-atomic="true">
+      <!-- Officer items populated by JS -->
+    </ul>
+    <form id="officer-form" aria-label="Add new officer" style="margin-top:1rem;">
+      <label for="officer-name">Add Officer</label>
+      <input type="text" id="officer-name" placeholder="Officer name" maxlength="30" required />
+      <button type="submit">Add Officer</button>
+    </form>
+  </div>
 
-<footer style="text-align:center; color:#8e8e93; font-size: 0.85rem; margin-top: 3rem;">
-  <p>Template designed for smooth iPhone-like UX.</p>
-  <p>
-    Consider GitHub Actions for automation:<br />
-    - Parse GitHub Issues & Labels to update case lists.<br />
-    - Regenerate this file periodically.<br />
-    - Trigger notifications on overdue/follow-up cases.
-  </p>
-  <p style="font-style: italic;">Last updated: <time datetime="2025-07-05">July 5, 2025</time></p>
-</footer>
+  <footer>
+    <p>Advanced Internal Affairs Dashboard — Red Theme UI/UX</p>
+    <p>
+      Data stored locally on your browser.<br />
+      To persist data on server or sync with GitHub, integrate with backend or GitHub Actions.<br />
+      Refresh page to reset data.
+    </p>
+  </footer>
 
-<!--
-  Instructions for maintenance:
+<script>
+  // Data arrays (load from localStorage or default)
+  let cases = JSON.parse(localStorage.getItem('ia_cases')) || [
+    {id:"IA-001", type:"Abuse of Power", status:"Open", officer:"Jane Doe", due:"2025-07-10", followup:true},
+    {id:"IA-002", type:"Misconduct", status:"Closed", officer:"John Smith", due:"2025-06-28", followup:false},
+    {id:"IA-003", type:"Corruption", status:"Pending", officer:"Alice Chen", due:"2025-07-12", followup:true},
+  ];
+  let officers = JSON.parse(localStorage.getItem('ia_officers')) || ["Jane Doe","John Smith","Alice Chen"];
 
-  - Update the progress circle stroke-dashoffset and progress text manually.
-  - Add or edit <details> blocks inside Cases section for new or updated cases.
-  - Modify bar-fill widths and colors in Case Breakdown to reflect current stats.
-  - Update officer performance table with new numbers and adjust efficiency bars.
-  - Add or remove file links in File Attachments.
-  - Mark follow-ups and update overdue info in the Follow-ups table.
-  - Update End-of-Month Summary as needed.
+  // Cached DOM
+  const tbody = document.getElementById('cases-tbody');
+  const progressBar = document.getElementById('progress-bar');
+  const progressText = document.getElementById('progress-text');
+  const breakdownContainer = document.getElementById('breakdown-container');
+  const officerList = document.getElementById('officer-list');
+  const caseForm = document.getElementById('case-form');
+  const editIndexInput = document.getElementById('edit-index');
+  const formTitle = document.getElementById('form-title');
+  const formSubmitBtn = document.getElementById('form-submit');
+  const formCancelBtn = document.getElementById('form-cancel');
 
-  Potential enhancements with JavaScript or GitHub Actions:
+  // Form inputs
+  const caseIdInput = document.getElementById('case-id');
+  const caseTypeInput = document.getElementById('case-type');
+  const caseStatusInput = document.getElementById('case-status');
+  const caseOfficerInput = document.getElementById('case-officer');
+  const caseDueInput = document.getElementById('case-due');
+  const caseFollowupInput = document.getElementById('case-followup');
+  const officerNameInput = document.getElementById('officer-name');
 
-  - JS: Add sorting, filtering, and dynamic case creation.
-  - GitHub Actions: Pull issue data from GitHub API, generate updated HTML automatically.
--->
+  // Helper: Save to localStorage
+  function saveData() {
+    localStorage.setItem('ia_cases', JSON.stringify(cases));
+    localStorage.setItem('ia_officers', JSON.stringify(officers));
+  }
+
+  // Render cases table
+  function renderCases() {
+    tbody.innerHTML = '';
+    cases.forEach((c, idx) => {
+      // Create row
+      const tr = document.createElement('tr');
+
+      // Case ID
+      let tdId = document.createElement('td');
+      tdId.textContent = c.id;
+      tdId.setAttribute('data-label', 'Case ID');
+      tr.appendChild(tdId);
+
+      // Type
+      let tdType = document.createElement('td');
+      tdType.textContent = c.type;
+      tdType.setAttribute('data-label', 'Type');
+      tr.appendChild(tdType);
+
+      // Status with badge
+      let tdStatus = document.createElement('td');
+      let spanBadge = document.createElement('span');
+      spanBadge.className = 'badge ' + c.status.toLowerCase();
+      spanBadge.textContent = c.status;
+      tdStatus.setAttribute('data-label', 'Status');
+      tdStatus.appendChild(spanBadge);
+      tr.appendChild(tdStatus);
+
+      // Assigned Officer
+      let tdOfficer = document.createElement('td');
+      tdOfficer.textContent = c.officer;
+      tdOfficer.setAttribute('data-label', 'Assigned Officer');
+      tr.appendChild(tdOfficer);
+
+      // Due Date
+      let tdDue = document.createElement('td');
+      tdDue.textContent = c.due;
+      tdDue.setAttribute('data-label', 'Due Date');
+      // Check overdue: past due date & not resolved/closed
+      const today = new Date().toISOString().slice(0,10);
+      if (c.due < today && !['Resolved','Closed'].includes(c.status)) {
+        tdDue.innerHTML += ' <span class="badge overdue" aria-label="Overdue case">⚠️ Overdue</span>';
+      }
+      tr.appendChild(tdDue);
+
+      // Follow-up checkbox disabled
+      let tdFollow = document.createElement('td');
+      tdFollow.setAttribute('data-label', 'Follow-up');
+      let checkbox = document.createElement('input');
+      checkbox.type = 'checkbox';
+      checkbox.checked = c.followup;
+      checkbox.disabled = true;
+      checkbox.setAttribute('aria-label', `Follow-up required for ${c.id}`);
+      tdFollow.appendChild(checkbox);
+      tr.appendChild(tdFollow);
+
+      // Actions: Edit / Delete
+      let tdActions = document.createElement('td');
+      tdActions.style.textAlign = 'center';
+
+      // Edit button
+      let btnEdit = document.createElement('button');
+      btnEdit.textContent = 'Edit';
+      btnEdit.setAttribute('aria-label', `Edit ${c.id}`);
+      btnEdit.addEventListener('click', () => {
+        loadCaseIntoForm(idx);
+      });
+      tdActions.appendChild(btnEdit);
+
+      // Delete button
+      let btnDelete = document.createElement('button');
+      btnDelete.textContent = 'Delete';
+      btnDelete.style.marginLeft = '6px';
+      btnDelete.setAttribute('aria-label', `Delete ${c.id}`);
+      btnDelete.addEventListener('click', () => {
+        if (confirm(`Delete case ${c.id}? This action cannot be undone.`)) {
+          cases.splice(idx,1);
+          saveData();
+          renderCases();
+          renderProgress();
+          renderBreakdown();
+        }
+      });
+      tdActions.appendChild(btnDelete);
+
+      tr.appendChild(tdActions);
+
+      tbody.appendChild(tr);
+    });
+  }
+
+  // Render progress bar
+  function renderProgress() {
+    const total = cases.length;
+    const completed = cases.filter(c => ['Resolved', 'Closed'].includes(c.status)).length;
+    const percent = total === 0 ? 0 : Math.round((completed / total) * 100);
+    progressBar.style.width = percent + '%';
+    progressText.textContent = `Completed ${completed} / ${total} cases (${percent}%)`;
+    progressBar.parentElement.setAttribute('aria-valuenow', percent);
+  }
+
+  // Render breakdown by type
+  function renderBreakdown() {
+    // Count cases by type
+    const counts = cases.reduce((acc, c) => {
+      acc[c.type] = (acc[c.type] || 0) + 1;
+      return acc;
+    }, {});
+    const types = ["Abuse of Power","Misconduct","Corruption","Other"];
+    const maxCount = Math.max(...Object.values(counts),1);
+
+    breakdownContainer.innerHTML = '';
+
+    types.forEach(type => {
+      const count = counts[type] || 0;
+      const pct = Math.round((count / maxCount) * 100);
+      const div = document.createElement('div');
+      div.className = 'breakdown-item';
+      div.innerHTML = `
+        <div class="breakdown-label">${type} (${count})</div>
+        <div class="breakdown-bar" style="width:${pct}%; background:#b22222"></div>
+      `;
+      breakdownContainer.appendChild(div);
+    });
+  }
+
+  // Render officer list
+  function renderOfficers() {
+    officerList.innerHTML = '';
+    officers.forEach((name, idx) => {
+      const li = document.createElement('li');
+      li.textContent = name;
+
+      // Remove officer button
+      const btnRemove = document.createElement('button');
+      btnRemove.textContent = 'Remove';
+      btnRemove.setAttribute('aria-label', `Remove officer ${name}`);
+      btnRemove.addEventListener('click', () => {
+        if(confirm(`Remove officer ${name}? This will unassign all their cases.`)) {
+          // Unassign cases assigned to this officer
+          cases.forEach(c => { if(c.officer === name) c.officer = 'Unassigned'; });
+          officers.splice(idx, 1);
+          saveData();
+          renderCases();
+          renderOfficers();
+        }
+      });
+      li.appendChild(btnRemove);
+      officerList.appendChild(li);
+    });
+  }
+
+  // Load case into form for editing
+  function loadCaseIntoForm(idx) {
+    const c = cases[idx];
+    editIndexInput.value = idx;
+    caseIdInput.value = c.id;
+    caseTypeInput.value = c.type;
+    caseStatusInput.value = c.status;
+    caseOfficerInput.value = c.officer;
+    caseDueInput.value = c.due;
+    caseFollowupInput.checked = c.followup;
+    formTitle.textContent = `Edit Case ${c.id}`;
+    formSubmitBtn.textContent = 'Update Case';
+    formCancelBtn.style.display = 'inline-block';
+    caseIdInput.focus();
+  }
+
+  // Reset form to "Add"
+  function resetForm() {
+    editIndexInput.value = -1;
+    caseForm.reset();
+    formTitle.textContent = 'Add New Case';
+    formSubmitBtn.textContent = 'Add Case';
+    formCancelBtn.style.display = 'none';
+  }
+
+  // Form submit handler
+  caseForm.addEventListener('submit', e => {
+    e.preventDefault();
+    const idx = parseInt(editIndexInput.value, 10);
+    const newCase = {
+      id: caseIdInput.value.trim(),
+      type: caseTypeInput.value,
+      status: caseStatusInput.value,
+      officer: caseOfficerInput.value.trim() || 'Unassigned',
+      due: caseDueInput.value,
+      followup: caseFollowupInput.checked
+    };
+
+    // Basic validation: unique case id for new cases
+    if (idx === -1 && cases.some(c => c.id.toLowerCase() === newCase.id.toLowerCase())) {
+      alert('Case ID must be unique.');
+      return;
+    }
+
+    if(idx === -1) {
+      cases.push(newCase);
+    } else {
+      cases[idx] = newCase;
+    }
+    saveData();
+    renderCases();
+    renderProgress();
+    renderBreakdown();
+    resetForm();
+  });
+
+  // Cancel edit
+  formCancelBtn.addEventListener('click', () => {
+    resetForm();
+  });
+
+  // Add officer form
+  document.getElementById('officer-form').addEventListener('submit', e => {
+    e.preventDefault();
+    const name = officerNameInput.value.trim();
+    if (!name) return alert('Enter officer name.');
+    if (officers.includes(name)) {
+      alert('Officer already exists.');
+      return;
+    }
+    officers.push(name);
+    saveData();
+    renderOfficers();
+    officerNameInput.value = '';
+  });
+
+  // Initialize
+  function init() {
+    renderCases();
+    renderProgress();
+    renderBreakdown();
+    renderOfficers();
+  }
+
+  init();
+</script>
 
 </body>
 </html>
