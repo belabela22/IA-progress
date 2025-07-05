@@ -1058,3 +1058,545 @@ Internal Affairs Dashboard</h1>
 
 </body>
 </html>
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>Internal Affairs Dashboard with Tasks</title>
+<style>
+  /* --- Base styles --- */
+  body {
+    font-family: Arial, sans-serif;
+    background: #f5f7fa;
+    margin: 0; padding: 0;
+  }
+  header {
+    background: #4D8076;
+    color: white;
+    padding: 1rem 1.5rem;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+  }
+  header h1 {
+    margin: 0;
+    font-size: 1.5rem;
+  }
+  nav button {
+    background: #4D7BA7;
+    border: none;
+    padding: 0.5rem 1rem;
+    margin-left: 0.5rem;
+    color: white;
+    cursor: pointer;
+    font-weight: bold;
+    border-radius: 4px;
+    transition: background-color 0.25s;
+  }
+  nav button.active, nav button:hover {
+    background: #35617a;
+  }
+
+  main {
+    padding: 1rem 1.5rem;
+  }
+  /* --- Login styles --- */
+  #login-container {
+    max-width: 350px;
+    margin: 3rem auto;
+    background: white;
+    padding: 2rem;
+    border-radius: 8px;
+    box-shadow: 0 0 15px #ccc;
+  }
+  #login-container h2 {
+    margin-top: 0;
+    margin-bottom: 1rem;
+    text-align: center;
+    color: #4D8076;
+  }
+  #login-form label {
+    display: block;
+    margin-top: 1rem;
+    font-weight: bold;
+  }
+  #login-form input {
+    width: 100%;
+    padding: 0.5rem;
+    margin-top: 0.25rem;
+    box-sizing: border-box;
+  }
+  #login-form button {
+    margin-top: 1.5rem;
+    width: 100%;
+    padding: 0.75rem;
+    background: #4D7BA7;
+    color: white;
+    border: none;
+    cursor: pointer;
+    font-weight: bold;
+    border-radius: 4px;
+  }
+  #login-error {
+    color: red;
+    margin-top: 0.5rem;
+    text-align: center;
+  }
+
+  /* --- General table styles --- */
+  table {
+    width: 100%;
+    border-collapse: collapse;
+    margin-top: 1rem;
+  }
+  th, td {
+    border: 1px solid #ddd;
+    padding: 0.5rem;
+    text-align: left;
+  }
+  th {
+    background: #4D8076;
+    color: white;
+  }
+  button {
+    cursor: pointer;
+  }
+  button:focus {
+    outline: 2px solid #35617a;
+  }
+  .badge {
+    padding: 0.2rem 0.5rem;
+    border-radius: 4px;
+    color: white;
+    font-weight: bold;
+    font-size: 0.85rem;
+    display: inline-block;
+    user-select: none;
+  }
+  .badge.open { background-color: #228B22; }
+  .badge.pending { background-color: #DAA520; }
+  .badge.resolved { background-color: #1E90FF; }
+  .badge.closed { background-color: #555; }
+
+  /* --- Progress bar --- */
+  #progress-container {
+    margin-top: 1rem;
+    background: #ddd;
+    border-radius: 10px;
+    height: 20px;
+    overflow: hidden;
+  }
+  #progress-bar {
+    height: 100%;
+    background: #4D7BA7;
+    width: 0;
+    transition: width 0.5s;
+  }
+  #progress-text {
+    margin-top: 0.25rem;
+    font-weight: bold;
+    color: #4D8076;
+  }
+
+  /* --- Case form --- */
+  form {
+    margin-top: 1rem;
+    background: white;
+    padding: 1rem;
+    border-radius: 8px;
+    box-shadow: 0 0 10px #ccc;
+  }
+  form > div {
+    margin-bottom: 0.8rem;
+  }
+  label {
+    font-weight: bold;
+    display: block;
+    margin-bottom: 0.25rem;
+  }
+  input[type=text], input[type=number], input[type=date], select {
+    width: 100%;
+    padding: 0.4rem;
+    box-sizing: border-box;
+    border-radius: 4px;
+    border: 1px solid #aaa;
+  }
+  input[type=checkbox] {
+    transform: scale(1.2);
+    margin-right: 0.5rem;
+  }
+  form button {
+    background: #4D8076;
+    color: white;
+    border: none;
+    padding: 0.6rem 1.2rem;
+    font-weight: bold;
+    border-radius: 5px;
+  }
+  form button:hover {
+    background: #35617a;
+  }
+  #form-cancel {
+    margin-left: 0.5rem;
+    background: #b22222;
+  }
+
+  /* --- Officer list --- */
+  #officer-list {
+    list-style: none;
+    padding-left: 0;
+  }
+  #officer-list li {
+    background: white;
+    margin-bottom: 0.5rem;
+    padding: 0.5rem 0.8rem;
+    border-radius: 6px;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+  }
+  #officer-list button {
+    background: #b22222;
+    border: none;
+    color: white;
+    padding: 0.3rem 0.6rem;
+    border-radius: 4px;
+    font-size: 0.85rem;
+  }
+
+  /* --- Case breakdown bars --- */
+  #breakdown-container {
+    margin-top: 1rem;
+  }
+  .breakdown-item {
+    margin-bottom: 0.5rem;
+  }
+  .breakdown-label {
+    font-weight: bold;
+    margin-bottom: 0.25rem;
+  }
+  .breakdown-bar {
+    height: 14px;
+    background: #4D7BA7;
+    border-radius: 6px;
+  }
+
+  /* --- Leaderboard --- */
+  #leaderboard {
+    margin-top: 2rem;
+  }
+  #leaderboard table {
+    width: 100%;
+  }
+  #leaderboard th {
+    background: #35617a;
+  }
+
+  /* --- Hidden sections --- */
+  .hidden {
+    display: none;
+  }
+
+  /* --- Blackreport extra fields --- */
+  #blackreport-fields {
+    margin-top: 0.5rem;
+    padding: 0.75rem;
+    background: #f1f8f7;
+    border-radius: 6px;
+    border: 1px solid #4D8076;
+  }
+
+  /* --- Tasks page styles --- */
+  #tasks-page {
+    display: none;
+  }
+  #tasks-page h2 {
+    color: #4D8076;
+  }
+  #tasks-list {
+    list-style: none;
+    padding-left: 0;
+    max-width: 600px;
+  }
+  #tasks-list li {
+    background: white;
+    margin-bottom: 0.5rem;
+    padding: 0.6rem 1rem;
+    border-radius: 6px;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+  }
+  #tasks-list label {
+    cursor: pointer;
+    flex-grow: 1;
+  }
+  #tasks-list input[type=checkbox] {
+    margin-right: 1rem;
+    transform: scale(1.3);
+  }
+
+  /* Task performance table */
+  #task-performance-table {
+    margin-top: 1.5rem;
+    width: 100%;
+    max-width: 600px;
+    border-collapse: collapse;
+  }
+  #task-performance-table th, #task-performance-table td {
+    border: 1px solid #ddd;
+    padding: 0.5rem;
+    text-align: center;
+  }
+  #task-performance-table th {
+    background: #4D8076;
+    color: white;
+  }
+
+  /* Tickets answered summary */
+  #tickets-summary {
+    margin-top: 2rem;
+    max-width: 600px;
+  }
+  #tickets-summary h3 {
+    color: #4D8076;
+  }
+  #tickets-summary table {
+    width: 100%;
+    border-collapse: collapse;
+  }
+  #tickets-summary th, #tickets-summary td {
+    border: 1px solid #ddd;
+    padding: 0.5rem;
+    text-align: center;
+  }
+  #tickets-summary th {
+    background: #4D8076;
+    color: white;
+  }
+
+  /* Responsive */
+  @media (max-width: 700px) {
+    table, #task-performance-table, #tickets-summary table {
+      font-size: 0.9rem;
+    }
+    nav {
+      flex-wrap: wrap;
+    }
+    nav button {
+      margin-top: 0.5rem;
+    }
+  }
+</style>
+</head>
+<body>
+
+<header>
+  <h1>Internal Affairs Dashboard</h1>
+  <nav>
+    <button id="nav-cases" class="active" aria-current="page">Cases</button>
+    <button id="nav-tasks">Tasks & Performance</button>
+    <button id="logout-btn" style="background:#b22222;">Logout</button>
+  </nav>
+</header>
+
+<!-- Login container -->
+<div id="login-container" role="main" aria-label="Login form container">
+  <h2>Login</h2>
+  <form id="login-form" aria-describedby="login-error">
+    <label for="username">Username</label>
+    <input type="text" id="username" name="username" autocomplete="username" required />
+
+    <label for="password">Password</label>
+    <input type="password" id="password" name="password" autocomplete="current-password" required />
+
+    <button type="submit">Log In</button>
+    <div id="login-error" role="alert" aria-live="assertive"></div>
+  </form>
+</div>
+
+<!-- Main app container -->
+<main id="app" class="hidden" role="main" aria-label="Internal affairs management">
+
+  <!-- Cases Page -->
+  <section id="cases-page" aria-label="Cases management">
+    <h2>Cases Management</h2>
+
+    <!-- Progress bar -->
+    <div id="progress-text" aria-live="polite"></div>
+    <div id="progress-container" role="progressbar" aria-valuemin="0" aria-valuemax="100">
+      <div id="progress-bar"></div>
+    </div>
+
+    <!-- Filters -->
+    <form id="filters-form" aria-label="Filter cases" style="margin-top: 1rem; max-width: 600px; display: flex; gap: 0.5rem; flex-wrap: wrap;">
+      <select id="filter-type" aria-label="Filter by case type">
+        <option value="">All Types</option>
+        <option value="Blackreport">Blackreport</option>
+        <option value="Normal">Normal</option>
+        <option value="Abuse">Abuse</option>
+        <option value="Misconduct">Misconduct</option>
+      </select>
+      <select id="filter-status" aria-label="Filter by status">
+        <option value="">All Status</option>
+        <option value="Open">Open</option>
+        <option value="Pending">Pending</option>
+        <option value="Resolved">Resolved</option>
+        <option value="Closed">Closed</option>
+      </select>
+      <select id="filter-officer" aria-label="Filter by assigned officer">
+        <option value="">All Officers</option>
+      </select>
+      <input type="search" id="case-search" placeholder="Search cases..." aria-label="Search cases by ID, type, status or officer" style="flex-grow: 1; min-width: 150px;" />
+      <button type="button" id="clear-filters" aria-label="Clear all filters">Clear</button>
+    </form>
+
+    <!-- Cases Table -->
+    <table aria-label="Cases table" id="cases-table">
+      <thead>
+        <tr>
+          <th>Case ID</th>
+          <th>Type</th>
+          <th>Status</th>
+          <th>Assigned Officer</th>
+          <th>Due Date</th>
+          <th>Follow-up</th>
+          <th>Actions</th>
+        </tr>
+      </thead>
+      <tbody id="cases-tbody"></tbody>
+    </table>
+
+    <!-- Case Form -->
+    <form id="case-form" aria-label="Add or edit case">
+      <h3 id="form-title">Add New Case</h3>
+
+      <div>
+        <label for="case-id">Case ID</label>
+        <input type="text" id="case-id" required autocomplete="off" />
+      </div>
+      <div>
+        <label for="case-type">Case Type</label>
+        <select id="case-type" required>
+          <option value="">Select type</option>
+          <option value="Normal">Normal</option>
+          <option value="Blackreport">Blackreport</option>
+          <option value="Abuse">Abuse</option>
+          <option value="Misconduct">Misconduct</option>
+        </select>
+      </div>
+      <div>
+        <label for="case-status">Status</label>
+        <select id="case-status" required>
+          <option value="Open">Open</option>
+          <option value="Pending">Pending</option>
+          <option value="Resolved">Resolved</option>
+          <option value="Closed">Closed</option>
+        </select>
+      </div>
+      <div>
+        <label for="case-officer">Assigned Officer</label>
+        <input type="text" id="case-officer" list="officers-datalist" autocomplete="off" />
+        <datalist id="officers-datalist"></datalist>
+      </div>
+      <div>
+        <label for="case-due">Due Date</label>
+        <input type="date" id="case-due" />
+      </div>
+      <div>
+        <label>
+          <input type="checkbox" id="case-followup" />
+          Follow-up required
+        </label>
+      </div>
+
+      <div id="blackreport-fields" class="hidden" aria-live="polite">
+        <div>
+          <label for="case-ban-duration">Ban Duration (days)</label>
+          <input type="number" id="case-ban-duration" min="1" />
+        </div>
+        <div>
+          <label for="case-severity">Severity</label>
+          <select id="case-severity">
+            <option value="">Select severity</option>
+            <option value="Low">Low</option>
+            <option value="Medium">Medium</option>
+            <option value="High">High</option>
+            <option value="Critical">Critical</option>
+          </select>
+        </div>
+      </div>
+
+      <button type="submit" id="form-submit">Add Case</button>
+      <button type="button" id="form-cancel" class="hidden">Cancel</button>
+    </form>
+
+    <!-- Officers -->
+    <section id="officers-section" aria-label="Officers management" style="margin-top: 2rem; max-width: 400px;">
+      <h3>Officers</h3>
+      <ul id="officer-list" aria-live="polite" aria-relevant="additions removals"></ul>
+      <form id="officer-form" aria-label="Add new officer" style="margin-top: 0.5rem;">
+        <input type="text" id="officer-name" placeholder="New officer name" autocomplete="off" required />
+        <button type="submit">Add Officer</button>
+      </form>
+    </section>
+
+    <!-- Breakdown -->
+    <section id="breakdown-container" aria-label="Case type breakdown"></section>
+
+    <!-- Leaderboard -->
+    <section id="leaderboard" aria-label="Officer leaderboard">
+      <h3>Officer Leaderboard</h3>
+      <table>
+        <thead>
+          <tr>
+            <th>Officer</th>
+            <th>Assigned Cases</th>
+            <th>Completed Cases</th>
+            <th>Efficiency</th>
+          </tr>
+        </thead>
+        <tbody id="leaderboard-body"></tbody>
+      </table>
+    </section>
+  </section>
+
+  <!-- Tasks Page -->
+  <section id="tasks-page" aria-label="Tasks and performance management">
+    <h2>Tasks & Performance</h2>
+
+    <p>Mark tasks completed by each officer and view their performance based on task completion and tickets answered.</p>
+
+    <!-- Tasks List -->
+    <ul id="tasks-list" aria-live="polite" aria-relevant="additions">
+      <!-- Dynamically filled -->
+    </ul>
+
+    <!-- Task Completion Performance Table -->
+    <table id="task-performance-table" aria-label="Officer task completion performance">
+      <thead>
+        <tr>
+          <th>Officer</th>
+          <th>Tasks Completed</th>
+          <th>Total Tasks</th>
+          <th>Task Completion %</th>
+        </tr>
+      </thead>
+      <tbody>
+        <!-- Filled dynamically -->
+      </tbody>
+    </table>
+
+    <!-- Tickets Answered Summary -->
+    <section id="tickets-summary" aria-label="Tickets answered summary">
+      <h3>Tickets Answered Per Officer</h3>
+      <table aria-describedby="tickets-summary">
+        <thead>
+          <tr>
+            <th>Officer</th>
+            <th>Tickets Answered</th>
+          </tr>
+        </thead>
+        <tbody>
