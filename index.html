@@ -5,7 +5,6 @@
 <meta name="viewport" content="width=device-width, initial-scale=1" />
 <title>Internal Affairs Dashboard — Advanced Red Theme</title>
 <style>
-  /* Your original styles here (kept as is for brevity) */
   /* Fonts & Reset */
   *, *::before, *::after {
     box-sizing: border-box;
@@ -41,6 +40,7 @@
     padding: 1.5rem 2rem;
     box-shadow: 0 4px 15px rgba(139,0,0,0.25);
   }
+  /* Buttons */
   button {
     cursor: pointer;
     background-color: #b22222;
@@ -55,6 +55,7 @@
   button:hover {
     background-color: #8b0000;
   }
+  /* Inputs */
   input[type="text"], input[type="date"], select, textarea {
     font-size: 1rem;
     padding: 0.4rem 0.6rem;
@@ -73,6 +74,7 @@
   label {
     font-weight: 600;
   }
+  /* Progress Bar */
   .progress-container {
     background: #f9d6d6;
     border-radius: 20px;
@@ -95,6 +97,7 @@
     color: #660000;
     font-size: 1.1rem;
   }
+  /* Table styles */
   table {
     width: 100%;
     border-collapse: separate;
@@ -128,6 +131,7 @@
   tbody td button:hover {
     background: #a53030;
   }
+  /* Badge styles */
   .badge {
     padding: 0.3rem 0.7rem;
     border-radius: 15px;
@@ -138,12 +142,13 @@
     text-align: center;
     user-select: none;
   }
-  .open { background: #dc3545; }
-  .pending { background: #fd7e14; }
-  .resolved { background: #28a745; }
-  .closed { background: #6c757d; }
+  .open { background: #dc3545; }      /* Bootstrap Danger Red */
+  .pending { background: #fd7e14; }   /* Orange */
+  .resolved { background: #28a745; }  /* Green */
+  .closed { background: #6c757d; }    /* Gray */
   .overdue { background: #b22222; }
   .followup { background: #c82333; }
+  /* Responsive layout */
   @media (max-width: 650px) {
     table, thead, tbody, tr, th, td {
       display: block;
@@ -182,6 +187,7 @@
       width: 100%;
     }
   }
+  /* Form section */
   form {
     background: #ffe5e5;
     border-radius: 15px;
@@ -192,6 +198,7 @@
   form > div {
     margin-bottom: 1rem;
   }
+  /* Officer list */
   .officer-list {
     margin-top: 1rem;
     padding: 0;
@@ -213,6 +220,7 @@
     font-size: 0.8rem;
     padding: 0.2rem 0.5rem;
   }
+  /* Bar chart for breakdown */
   .breakdown {
     margin-top: 1rem;
   }
@@ -231,6 +239,7 @@
     width: 0;
     transition: width 0.5s ease;
   }
+  /* Alerts */
   .alert {
     background: #ffe0e0;
     border: 1.5px solid #b22222;
@@ -240,1363 +249,649 @@
     font-weight: 700;
     margin-bottom: 1rem;
   }
+  /* Footer */
   footer {
     text-align: center;
     color: #8b0000;
     font-size: 0.85rem;
     margin-top: 3rem;
   }
-
-  /* Login form styles */
-  #login-container {
-    max-width: 400px;
-    margin: 3rem auto;
-    background: #ffe5e5;
-    border-radius: 15px;
-    padding: 2rem;
-    box-shadow: 0 4px 15px rgba(139,0,0,0.25);
+  /* Navigation buttons */
+  #nav-buttons {
     text-align: center;
-  }
-  #login-container h2 {
     margin-bottom: 1rem;
   }
-  #login-container input {
-    margin-bottom: 1rem;
-  }
-  #logout-btn {
-    margin-top: 1rem;
+  #nav-buttons button {
+    margin: 0 0.5rem;
+    min-width: 120px;
   }
 </style>
 </head>
 <body>
 
-<!-- LOGIN FORM (shows if NOT logged in) -->
-<div id="login-container" aria-label="Login form" style="display:none;">
-  <h2>Internal Affairs Login</h2>
-  <form id="login-form">
-    <label for="login-username">Username</label><br />
-    <input type="text" id="login-username" name="username" required autocomplete="username" /><br />
-    <label for="login-password">Password</label><br />
-    <input type="password" id="login-password" name="password" required autocomplete="current-password" /><br />
-    <button type="submit">Log In</button>
-  </form>
-  <div id="login-error" role="alert" style="color:#b22222; margin-top:10px;"></div>
-</div>
+  <h1>🕵️‍♂️ Internal Affairs Dashboard</h1>
 
-<!-- MAIN APP (shows if logged in) -->
-<div id="app" style="display:none;">
-  <h1>[![IMG-0489.jpg](https://i.postimg.cc/LXHxXcKz/IMG-0489.jpg)](https://postimg.cc/rdP1ZYpm)  
-Internal Affairs Dashboard</h1>
-
-  <button id="logout-btn" style="float:right; background:#8b0000;">Log Out</button>
-
-  <div class="container" aria-label="Progress overview">
-    <h2>Progress Overview</h2>
-    <div class="progress-text" id="progress-text">Loading progress...</div>
-    <div class="progress-container" role="progressbar" aria-valuemin="0" aria-valuemax="100" aria-valuenow="0" aria-label="Case completion progress">
-      <div class="progress-bar" id="progress-bar"></div>
-    </div>
+  <!-- Navigation Buttons -->
+  <div id="nav-buttons" role="navigation" aria-label="Main navigation">
+    <button id="btn-cases" aria-pressed="true" aria-label="Show Cases page">Cases</button>
+    <button id="btn-tasks" aria-pressed="false" aria-label="Show Tasks and Tickets page">Tasks & Tickets</button>
   </div>
 
-  <div class="container" aria-label="Cases management">
-    <h2>Cases</h2>
+  <!-- Cases Page -->
+  <div id="cases-page">
 
-    <!-- Search and Filter -->
-    <div style="margin-bottom:1rem;">
-      <input type="text" id="case-search" placeholder="Search cases..." style="width:40%; padding:0.3rem; margin-right:1rem;" aria-label="Search cases" />
-      <select id="filter-type" aria-label="Filter by type">
-        <option value="">All Types</option>
-        <option value="Abuse of Power">Abuse of Power</option>
-        <option value="Misconduct">Misconduct</option>
-        <option value="Corruption">Corruption</option>
-        <option value="Other">Other</option>
-        <option value="Blackreport">Blackreport</option>
-      </select>
-      <select id="filter-status" aria-label="Filter by status" style="margin-left:1rem;">
-        <option value="">All Statuses</option>
-        <option value="Open">Open</option>
-        <option value="Pending">Pending</option>
-        <option value="Resolved">Resolved</option>
-        <option value="Closed">Closed</option>
-      </select>
-      <select id="filter-officer" aria-label="Filter by officer" style="margin-left:1rem;">
-        <option value="">All Officers</option>
-      </select>
-      <button id="clear-filters" style="margin-left:1rem; background:#660000;">Clear</button>
+    <div class="container" aria-label="Progress overview">
+      <h2>Progress Overview</h2>
+      <div class="progress-text" id="progress-text">Loading progress...</div>
+      <div class="progress-container" role="progressbar" aria-valuemin="0" aria-valuemax="100" aria-valuenow="0" aria-label="Case completion progress">
+        <div class="progress-bar" id="progress-bar"></div>
+      </div>
     </div>
 
-    <table aria-describedby="cases-desc" aria-live="polite" id="cases-table" role="table">
-      <caption id="cases-desc" class="sr-only">List of Internal Affairs cases with details</caption>
-      <thead>
-        <tr>
-          <th scope="col">Case ID</th>
-          <th scope="col">Type</th>
-          <th scope="col">Status</th>
-          <th scope="col">Assigned Officer</th>
-          <th scope="col">Due Date</th>
-          <th scope="col">Follow-up</th>
-          <th scope="col" style="width: 120px;">Actions</th>
-        </tr>
-      </thead>
-      <tbody id="cases-tbody">
-        <!-- Rows populated by JS -->
-      </tbody>
-    </table>
+    <div class="container" aria-label="Cases management">
+      <h2>Cases</h2>
+      <table aria-describedby="cases-desc" aria-live="polite" id="cases-table" role="table">
+        <caption id="cases-desc" class="sr-only">List of Internal Affairs cases with details</caption>
+        <thead>
+          <tr>
+            <th scope="col">Case ID</th>
+            <th scope="col">Type</th>
+            <th scope="col">Status</th>
+            <th scope="col">Assigned Officer</th>
+            <th scope="col">Due Date</th>
+            <th scope="col">Follow-up</th>
+            <th scope="col" style="width: 100px;">Actions</th>
+          </tr>
+        </thead>
+        <tbody id="cases-tbody">
+          <!-- Rows populated by JS -->
+        </tbody>
+      </table>
 
-    <form id="case-form" aria-label="Add or update a case">
-      <h3 id="form-title">Add New Case</h3>
-      <input type="hidden" id="edit-index" value="-1" />
-      <div>
-        <label for="case-id">Case ID</label>
-        <input type="text" id="case-id" placeholder="E.g. IA-010" required maxlength="10" />
-      </div>
-      <div>
-        <label for="case-type">Type</label>
-        <select id="case-type" required>
-          <option value="">Select type</option>
-          <option value="Abuse of Power">Abuse of Power</option>
-          <option value="Misconduct">Misconduct</option>
-          <option value="Corruption">Corruption</option>
-          <option value="Other">Other</option>
-          <option value="Blackreport">Blackreport</option>
-        </select>
-      </div>
-      <div>
-        <label for="case-status">Status</label>
-        <select id="case-status" required>
-          <option value="">Select status</option>
-          <option value="Open">Open</option>
-          <option value="Pending">Pending</option>
-          <option value="Resolved">Resolved</option>
-          <option value="Closed">Closed</option>
-        </select>
-      </div>
-      <div>
-        <label for="case-officer">Assigned Officer</label>
-        <input type="text" id="case-officer" placeholder="Officer name" required maxlength="30" />
-      </div>
-      <div>
-        <label for="case-due">Due Date</label>
-        <input type="date" id="case-due" required />
-      </div>
-      <div>
-        <label><input type="checkbox" id="case-followup" /> Follow-up Required</label>
-      </div>
-
-      <!-- Blackreport extra fields -->
-      <div id="blackreport-fields" style="display:none; margin-top: 1rem;">
+      <form id="case-form" aria-label="Add or update a case">
+        <h3 id="form-title">Add New Case</h3>
+        <input type="hidden" id="edit-index" value="-1" />
         <div>
-          <label for="case-ban-duration">Ban Duration (days)</label>
-          <input type="number" id="case-ban-duration" min="1" max="365" />
+          <label for="case-id">Case ID</label>
+          <input type="text" id="case-id" placeholder="E.g. IA-010" required maxlength="10" />
         </div>
         <div>
-          <label for="case-severity">Severity</label>
-          <select id="case-severity">
-            <option value="">Select severity</option>
-            <option value="Low">Low</option>
-            <option value="Medium">Medium</option>
-            <option value="High">High</option>
-            <option value="Critical">Critical</option>
+          <label for="case-type">Type</label>
+          <select id="case-type" required>
+            <option value="">Select type</option>
+            <option value="Abuse of Power">Abuse of Power</option>
+            <option value="Misconduct">Misconduct</option>
+            <option value="Corruption">Corruption</option>
+            <option value="Other">Other</option>
+            <option value="Blackreport">Blackreport</option>
           </select>
         </div>
+        <div>
+          <label for="case-status">Status</label>
+          <select id="case-status" required>
+            <option value="">Select status</option>
+            <option value="Open">Open</option>
+            <option value="Pending">Pending</option>
+            <option value="Resolved">Resolved</option>
+            <option value="Closed">Closed</option>
+          </select>
+        </div>
+        <div>
+          <label for="case-officer">Assigned Officer</label>
+          <input type="text" id="case-officer" placeholder="Officer name" required maxlength="30" />
+        </div>
+        <div>
+          <label for="case-due">Due Date</label>
+          <input type="date" id="case-due" required />
+        </div>
+        <div>
+          <label><input type="checkbox" id="case-followup" /> Follow-up Required</label>
+        </div>
+
+        <!-- Extra fields for Blackreport case -->
+        <div id="blackreport-extra" style="display:none; margin-top:1rem; padding:0.8rem; border:1px solid #b22222; border-radius: 8px; background: #ffdede;">
+          <h4>Blackreport Details</h4>
+          <div>
+            <label for="ban-duration">Ban Duration (days)</label>
+            <input type="number" id="ban-duration" min="1" max="365" />
+          </div>
+          <div>
+            <label for="severity">Severity</label>
+            <select id="severity">
+              <option value="">Select severity</option>
+              <option value="Low">Low</option>
+              <option value="Medium">Medium</option>
+              <option value="High">High</option>
+              <option value="Critical">Critical</option>
+            </select>
+          </div>
+        </div>
+
+        <button type="submit" id="form-submit">Add Case</button>
+        <button type="button" id="form-cancel" style="display:none; margin-left: 10px; background:#660000;">Cancel Edit</button>
+      </form>
+    </div>
+
+    <div class="container" aria-label="Case type breakdown">
+      <h2>Case Breakdown by Type</h2>
+      <div id="breakdown-container" class="breakdown" aria-live="polite" aria-atomic="true">
+        <!-- Bar charts populated by JS -->
       </div>
+    </div>
 
-      <button type="submit" id="form-submit">Add Case</button>
-      <button type="button" id="form-cancel" style="display:none; margin-left: 10px; background:#660000;">Cancel Edit</button>
-    </form>
+    <div class="container" aria-label="Officer management">
+      <h2>Officers</h2>
+      <ul id="officer-list" class="officer-list" aria-live="polite" aria-atomic="true">
+        <!-- Officer items populated by JS -->
+      </ul>
+      <form id="officer-form" aria-label="Add new officer" style="margin-top:1rem;">
+        <label for="officer-name">Add Officer</label>
+        <input type="text" id="officer-name" placeholder="Officer name" maxlength="30" required />
+        <button type="submit">Add Officer</button>
+      </form>
+    </div>
+
   </div>
 
-  <div class="container" aria-label="Case type breakdown">
-    <h2>Case Breakdown by Type</h2>
-    <div id="breakdown-container" class="breakdown" aria-live="polite" aria-atomic="true"></div>
-  </div>
+  <!-- Tasks & Tickets Page -->
+  <div id="tasks-page" style="display:none;">
+    <div class="container" aria-label="Tasks performance">
+      <h2>Tasks Performance</h2>
 
-  <div class="container" aria-label="Officer management">
-    <h2>Officers</h2>
-    <ul id="officer-list" class="officer-list" aria-live="polite" aria-atomic="true"></ul>
-    <form id="officer-form" aria-label="Add new officer" style="margin-top:1rem;">
-      <label for="officer-name">Add Officer</label>
-      <input type="text" id="officer-name" placeholder="Officer name" maxlength="30" required />
-      <button type="submit">Add Officer</button>
-    </form>
-  </div>
+      <table aria-describedby="tasks-desc" aria-live="polite" id="tasks-table" role="table" style="margin-bottom:1rem;">
+        <caption id="tasks-desc" class="sr-only">List of tasks and completion status per member</caption>
+        <thead>
+          <tr>
+            <th scope="col">Task</th>
+            <th scope="col">Assigned To</th>
+            <th scope="col">Completed</th>
+          </tr>
+        </thead>
+        <tbody id="tasks-tbody">
+          <!-- Populated by JS -->
+        </tbody>
+      </table>
 
-  <div class="container" aria-label="Leaderboard">
-    <h2>Officers Leaderboard</h2>
-    <table id="leaderboard-table" style="width:100%; border-collapse: collapse;">
-      <thead style="background:#8b0000; color:white;">
-        <tr>
-          <th>Officer</th>
-          <th>Assigned Cases</th>
-          <th>Completed Cases</th>
-          <th>Efficiency</th>
-        </tr>
-      </thead>
-      <tbody id="leaderboard-body"></tbody>
-    </table>
+      <h2>Ticket Response Leaderboard</h2>
+      <ul id="ticket-leaderboard" class="officer-list" aria-live="polite" aria-atomic="true">
+        <!-- Populated by JS -->
+      </ul>
+    </div>
   </div>
 
   <footer>
     <p>Advanced Internal Affairs Dashboard — Red Theme UI/UX</p>
     <p>
       Data stored locally on your browser.<br />
-      Refresh page to reset data.<br />
+      To persist data on server or sync with GitHub, integrate with backend or GitHub Actions.<br />
+      Refresh page to reset data.
     </p>
   </footer>
-</div>
 
 <script>
-  // --- LOGIN MODULE ---
-  const LoginModule = (() => {
-    const USERNAME = 'IADirector';
-    const PASSWORD = 'IADirector1';
-    const STORAGE_KEY = 'ia_login';
+  // Data arrays (load from localStorage or default)
+  let cases = JSON.parse(localStorage.getItem('ia_cases')) || [
+    {id:"IA-001", type:"Abuse of Power", status:"Open", officer:"Jane Doe", due:"2025-07-10", followup:true},
+    {id:"IA-002", type:"Misconduct", status:"Closed", officer:"John Smith", due:"2025-06-28", followup:false},
+    {id:"IA-003", type:"Corruption", status:"Pending", officer:"Alice Chen", due:"2025-07-12", followup:true},
+  ];
+  let officers = JSON.parse(localStorage.getItem('ia_officers')) || ["Jane Doe","John Smith","Alice Chen"];
 
-    function authenticate(username, password) {
-      if (username === USERNAME && password === PASSWORD) {
-        sessionStorage.setItem(STORAGE_KEY, JSON.stringify({ loggedIn: true, username }));
-        return true;
-      }
-      return false;
-    }
+  // Extra Blackreport fields stored per case id
+  let blackreportDetails = JSON.parse(localStorage.getItem('ia_blackreportDetails')) || {};
 
-    function logout() {
-      sessionStorage.removeItem(STORAGE_KEY);
-    }
+  // Cached DOM
+  const tbody = document.getElementById('cases-tbody');
+  const progressBar = document.getElementById('progress-bar');
+  const progressText = document.getElementById('progress-text');
+  const breakdownContainer = document.getElementById('breakdown-container');
+  const officerList = document.getElementById('officer-list');
+  const caseForm = document.getElementById('case-form');
+  const editIndexInput = document.getElementById('edit-index');
+  const formTitle = document.getElementById('form-title');
+  const formSubmitBtn = document.getElementById('form-submit');
+  const formCancelBtn = document.getElementById('form-cancel');
 
-    function isLoggedIn() {
-      const data = JSON.parse(sessionStorage.getItem(STORAGE_KEY));
-      return data?.loggedIn === true;
-    }
+  // Extra Blackreport fields DOM
+  const blackreportExtra = document.getElementById('blackreport-extra');
+  const banDurationInput = document.getElementById('ban-duration');
+  const severitySelect = document.getElementById('severity');
 
-    function getUsername() {
-      const data = JSON.parse(sessionStorage.getItem(STORAGE_KEY));
-      return data?.username || null;
-    }
+  // Form fields
+  const caseIdInput = document.getElementById('case-id');
+  const caseTypeSelect = document.getElementById('case-type');
+  const caseStatusSelect = document.getElementById('case-status');
+  const caseOfficerInput = document.getElementById('case-officer');
+  const caseDueInput = document.getElementById('case-due');
+  const caseFollowupCheckbox = document.getElementById('case-followup');
 
-    return { authenticate, logout, isLoggedIn, getUsername };
-  })();
+  // Navigation buttons & pages
+  const btnCases = document.getElementById('btn-cases');
+  const btnTasks = document.getElementById('btn-tasks');
+  const casesPage = document.getElementById('cases-page');
+  const tasksPage = document.getElementById('tasks-page');
 
-  // --- CASE MODEL ---
-  const CaseModel = (() => {
-    function createCase({
-      id,
-      type,
-      status = 'Open',
-      officer = 'Unassigned',
-      dueDate = '',
-      followUp = false,
-      banDuration = null,
-      severity = null,
-    }) {
-      if (type === 'Blackreport') {
-        if (banDuration == null || severity == null) {
-          throw new Error('Blackreport case requires banDuration and severity');
+  // Tasks and completed tasks storage
+  const tasks = [
+    { id: 'T1', name: 'Task 1' },
+    { id: 'T2', name: 'Task 2' },
+    { id: 'T3', name: 'Task 3' },
+    { id: 'T4', name: 'Task 4' },
+    { id: 'T5', name: 'Task 5' },
+    { id: 'T6', name: 'Task 6' },
+    { id: 'T7', name: 'Task 7' },
+    { id: 'T8', name: 'Task 8' },
+    { id: 'T9', name: 'Task 9' },
+    { id: 'T10', name: 'Task 10' },
+  ];
+  let completedTasks = JSON.parse(localStorage.getItem('ia_completedTasks')) || {};
+
+  // Util functions for localStorage save
+  function saveData() {
+    localStorage.setItem('ia_cases', JSON.stringify(cases));
+    localStorage.setItem('ia_officers', JSON.stringify(officers));
+    localStorage.setItem('ia_blackreportDetails', JSON.stringify(blackreportDetails));
+    localStorage.setItem('ia_completedTasks', JSON.stringify(completedTasks));
+  }
+
+  // Render Cases Table
+  function renderCases() {
+    tbody.innerHTML = '';
+    cases.forEach((c, idx) => {
+      const tr = document.createElement('tr');
+
+      // Case ID
+      const tdId = document.createElement('td');
+      tdId.textContent = c.id;
+      tdId.setAttribute('data-label', 'Case ID');
+      tr.appendChild(tdId);
+
+      // Type
+      const tdType = document.createElement('td');
+      tdType.textContent = c.type;
+      tdType.setAttribute('data-label', 'Type');
+      tr.appendChild(tdType);
+
+      // Status with badge and overdue highlight
+      const tdStatus = document.createElement('td');
+      tdStatus.setAttribute('data-label', 'Status');
+      const badge = document.createElement('span');
+      badge.className = 'badge ' + c.status.toLowerCase();
+      badge.textContent = c.status;
+      tdStatus.appendChild(badge);
+
+      // Overdue highlight if past due date and not closed
+      if (c.status.toLowerCase() !== 'closed') {
+        const today = new Date().toISOString().slice(0, 10);
+        if (c.due < today) {
+          badge.classList.add('overdue');
+          badge.textContent += ' (Overdue)';
         }
-        return {
-          id,
-          type,
-          status,
-          officer,
-          dueDate,
-          followUp,
-          banDuration,
-          severity,
-        };
-      } else {
-        return {
-          id,
-          type,
-          status,
-          officer,
-          dueDate,
-          followUp,
-        };
       }
+      tr.appendChild(tdStatus);
+
+      // Officer
+      const tdOfficer = document.createElement('td');
+      tdOfficer.textContent = c.officer;
+      tdOfficer.setAttribute('data-label', 'Assigned Officer');
+      tr.appendChild(tdOfficer);
+
+      // Due Date
+      const tdDue = document.createElement('td');
+      tdDue.textContent = c.due;
+      tdDue.setAttribute('data-label', 'Due Date');
+      tr.appendChild(tdDue);
+
+      // Follow-up
+      const tdFollowup = document.createElement('td');
+      tdFollowup.setAttribute('data-label', 'Follow-up');
+      tdFollowup.textContent = c.followup ? 'Yes' : 'No';
+      tr.appendChild(tdFollowup);
+
+      // Actions buttons (Edit/Delete)
+      const tdActions = document.createElement('td');
+      tdActions.style.textAlign = 'center';
+
+      const editBtn = document.createElement('button');
+      editBtn.textContent = 'Edit';
+      editBtn.title = `Edit case ${c.id}`;
+      editBtn.addEventListener('click', () => startEditCase(idx));
+      tdActions.appendChild(editBtn);
+
+      const delBtn = document.createElement('button');
+      delBtn.textContent = 'Delete';
+      delBtn.title = `Delete case ${c.id}`;
+      delBtn.style.marginLeft = '8px';
+      delBtn.addEventListener('click', () => deleteCase(idx));
+      tdActions.appendChild(delBtn);
+
+      tr.appendChild(tdActions);
+
+      tbody.appendChild(tr);
+    });
+  }
+
+  // Render Progress Bar and Text
+  function renderProgress() {
+    if (cases.length === 0) {
+      progressBar.style.width = '0%';
+      progressBar.setAttribute('aria-valuenow', 0);
+      progressText.textContent = 'No cases recorded yet.';
+      return;
     }
-    return { createCase };
-  })();
+    const resolvedCount = cases.filter(c => c.status.toLowerCase() === 'resolved' || c.status.toLowerCase() === 'closed').length;
+    const percent = Math.round((resolvedCount / cases.length) * 100);
+    progressBar.style.width = percent + '%';
+    progressBar.setAttribute('aria-valuenow', percent);
+    progressText.textContent = `Cases completed: ${resolvedCount} of ${cases.length} (${percent}%)`;
+  }
 
-  // --- CASE MANAGER ---
-  const CaseManager = (() => {
-    let cases = [];
-
-    function init(savedCases = []) {
-      cases = savedCases;
+  // Render Breakdown Bar Charts by Type
+  function renderBreakdown() {
+    breakdownContainer.innerHTML = '';
+    if (cases.length === 0) {
+      breakdownContainer.textContent = 'No cases to show.';
+      return;
     }
-    function save() {
-      localStorage.setItem('ia_cases', JSON.stringify(cases));
+    const typeCounts = {};
+    cases.forEach(c => {
+      typeCounts[c.type] = (typeCounts[c.type] || 0) + 1;
+    });
+    const maxCount = Math.max(...Object.values(typeCounts));
+    for (const [type, count] of Object.entries(typeCounts)) {
+      const itemDiv = document.createElement('div');
+      itemDiv.className = 'breakdown-item';
+
+      const label = document.createElement('div');
+      label.className = 'breakdown-label';
+      label.textContent = `${type} (${count})`;
+      itemDiv.appendChild(label);
+
+      const bar = document.createElement('div');
+      bar.className = 'breakdown-bar';
+      bar.style.width = `${(count / maxCount) * 100}%`;
+      itemDiv.appendChild(bar);
+
+      breakdownContainer.appendChild(itemDiv);
     }
+  }
 
-    function addCase(caseData) {
-      if (cases.some(c => c.id.toLowerCase() === caseData.id.toLowerCase())) {
-        throw new Error('Case ID must be unique');
-      }
-      cases.push(caseData);
-      save();
+  // Render Officers List
+  function renderOfficers() {
+    officerList.innerHTML = '';
+    if (officers.length === 0) {
+      officerList.textContent = 'No officers added.';
+      return;
     }
-    function editCase(caseId, updatedData) {
-      const idx = cases.findIndex(c => c.id === caseId);
-      if (idx === -1) throw new Error('Case not found');
-      cases[idx] = { ...cases[idx], ...updatedData };
-      save();
-    }
-    function deleteCase(caseId) {
-      cases = cases.filter(c => c.id !== caseId);
-      save();
-    }
-    function getCases() {
-      return [...cases];
-    }
-    function filterCases(criteria = {}) {
-      return cases.filter(c => {
-        if (criteria.status && c.status !== criteria.status) return false;
-        if (criteria.type && c.type !== criteria.type) return false;
-        if (criteria.officer && c.officer !== criteria.officer) return false;
-        return true;
-      });
-    }
-    function searchCases(term) {
-      if (!term) return getCases();
-      term = term.toLowerCase();
-      return cases.filter(c =>
-        c.id.toLowerCase().includes(term) ||
-        c.type.toLowerCase().includes(term) ||
-        (c.status && c.status.toLowerCase().includes(term)) ||
-        (c.officer && c.officer.toLowerCase().includes(term))
-      );
-    }
-    return { init, addCase, editCase, deleteCase, getCases, filterCases, searchCases };
-  })();
+    officers.forEach((officer, idx) => {
+      const li = document.createElement('li');
+      li.textContent = officer;
 
-  // --- OFFICER MANAGER ---
-  const OfficerManager = (() => {
-    let officers = [];
-
-    function init(savedOfficers = []) {
-      officers = savedOfficers;
-    }
-    function save() {
-      localStorage.setItem('ia_officers', JSON.stringify(officers));
-    }
-    function addOfficer(name) {
-      if (!name.trim()) throw new Error('Officer name required');
-      if (officers.includes(name)) throw new Error('Officer already exists');
-      officers.push(name);
-      save();
-    }
-    function removeOfficer(name) {
-      officers = officers.filter(o => o !== name);
-      save();
-    }
-    function getOfficers() {
-      return [...officers];
-    }
-    return { init, addOfficer, removeOfficer, getOfficers };
-  })();
-
-  // --- LEADERBOARD ---
-  const Leaderboard = (() => {
-    function calculate(cases, officers) {
-      const stats = officers.map(name => {
-        const assigned = cases.filter(c => c.officer === name);
-        const assignedCount = assigned.length;
-        const completedCount = assigned.filter(c => ['Resolved', 'Closed'].includes(c.status)).length;
-        const efficiency = assignedCount === 0 ? 0 : completedCount / assignedCount;
-        return { officer: name, assignedCount, completedCount, efficiency };
-      });
-      stats.sort((a, b) => b.efficiency - a.efficiency || b.assignedCount - a.assignedCount);
-      return stats;
-    }
-    return { calculate };
-  })();
-
-  // --- UI & App Logic ---
-  const app = (() => {
-    // Cache DOM
-    const loginContainer = document.getElementById('login-container');
-    const loginForm = document.getElementById('login-form');
-    const loginError = document.getElementById('login-error');
-
-    const appContainer = document.getElementById('app');
-    const logoutBtn = document.getElementById('logout-btn');
-
-    const progressText = document.getElementById('progress-text');
-    const progressBar = document.getElementById('progress-bar');
-
-    const casesTableBody = document.getElementById('cases-tbody');
-    const caseForm = document.getElementById('case-form');
-    const formTitle = document.getElementById('form-title');
-    const formSubmit = document.getElementById('form-submit');
-    const formCancel = document.getElementById('form-cancel');
-
-    const filterType = document.getElementById('filter-type');
-    const filterStatus = document.getElementById('filter-status');
-    const filterOfficer = document.getElementById('filter-officer');
-    const caseSearch = document.getElementById('case-search');
-    const clearFilters = document.getElementById('clear-filters');
-
-    const breakdownContainer = document.getElementById('breakdown-container');
-
-    const officerList = document.getElementById('officer-list');
-    const officerForm = document.getElementById('officer-form');
-    const officerNameInput = document.getElementById('officer-name');
-
-    // Case form inputs
-    const caseIdInput = document.getElementById('case-id');
-    const caseTypeSelect = document.getElementById('case-type');
-    const caseStatusSelect = document.getElementById('case-status');
-    const caseOfficerInput = document.getElementById('case-officer');
-    const caseDueInput = document.getElementById('case-due');
-    const caseFollowupCheckbox = document.getElementById('case-followup');
-    const blackreportFields = document.getElementById('blackreport-fields');
-    const caseBanDurationInput = document.getElementById('case-ban-duration');
-    const caseSeveritySelect = document.getElementById('case-severity');
-
-    const leaderboardBody = document.getElementById('leaderboard-body');
-
-    let editingIndex = -1;
-
-    // Util: Format date YYYY-MM-DD => readable
-    function formatDate(d) {
-      if (!d) return '';
-      const date = new Date(d);
-      return date.toLocaleDateString();
-    }
-
-    // --- Render Functions ---
-    function renderCasesTable(cases) {
-      casesTableBody.innerHTML = '';
-      if (cases.length === 0) {
-        casesTableBody.innerHTML = `<tr><td colspan="7" style="text-align:center; font-style: italic;">No cases found.</td></tr>`;
-        return;
-      }
-      cases.forEach(c => {
-        const tr = document.createElement('tr');
-
-        // Case ID
-        const tdId = document.createElement('td');
-        tdId.textContent = c.id;
-        tdId.setAttribute('data-label', 'Case ID');
-        tr.appendChild(tdId);
-
-        // Type
-        const tdType = document.createElement('td');
-        tdType.textContent = c.type;
-        tdType.setAttribute('data-label', 'Type');
-        tr.appendChild(tdType);
-
-        // Status with badge
-        const tdStatus = document.createElement('td');
-        tdStatus.setAttribute('data-label', 'Status');
-        const spanBadge = document.createElement('span');
-        spanBadge.classList.add('badge');
-        spanBadge.textContent = c.status;
-        switch (c.status.toLowerCase()) {
-          case 'open': spanBadge.classList.add('open'); break;
-          case 'pending': spanBadge.classList.add('pending'); break;
-          case 'resolved': spanBadge.classList.add('resolved'); break;
-          case 'closed': spanBadge.classList.add('closed'); break;
-          default: spanBadge.style.backgroundColor = '#b22222';
+      const delBtn = document.createElement('button');
+      delBtn.textContent = 'Remove';
+      delBtn.title = `Remove officer ${officer}`;
+      delBtn.addEventListener('click', () => {
+        if (confirm(`Remove officer "${officer}"? This will unassign them from all cases.`)) {
+          // Remove officer
+          officers.splice(idx,1);
+          // Unassign from cases
+          cases.forEach(c => { if(c.officer === officer) c.officer = 'Unassigned'; });
+          saveData();
+          renderAll();
         }
-        tdStatus.appendChild(spanBadge);
-        tr.appendChild(tdStatus);
-
-        // Officer
-        const tdOfficer = document.createElement('td');
-        tdOfficer.textContent = c.officer;
-        tdOfficer.setAttribute('data-label', 'Assigned Officer');
-        tr.appendChild(tdOfficer);
-
-        // Due Date
-        const tdDue = document.createElement('td');
-        tdDue.textContent = formatDate(c.dueDate);
-        tdDue.setAttribute('data-label', 'Due Date');
-        tr.appendChild(tdDue);
-
-        // Follow-up
-        const tdFollowup = document.createElement('td');
-        tdFollowup.textContent = c.followUp ? 'Yes' : 'No';
-        tdFollowup.setAttribute('data-label', 'Follow-up');
-        tr.appendChild(tdFollowup);
-
-        // Actions
-        const tdActions = document.createElement('td');
-        tdActions.setAttribute('data-label', 'Actions');
-        // Edit button
-        const btnEdit = document.createElement('button');
-        btnEdit.textContent = 'Edit';
-        btnEdit.setAttribute('aria-label', `Edit case ${c.id}`);
-        btnEdit.addEventListener('click', () => startEditCase(c.id));
-        tdActions.appendChild(btnEdit);
-
-        // Delete button
-        const btnDelete = document.createElement('button');
-        btnDelete.textContent = 'Delete';
-        btnDelete.style.marginLeft = '6px';
-        btnDelete.setAttribute('aria-label', `Delete case ${c.id}`);
-        btnDelete.addEventListener('click', () => {
-          if (confirm(`Delete case "${c.id}"? This action cannot be undone.`)) {
-            CaseManager.deleteCase(c.id);
-            renderAll();
-          }
-        });
-        tdActions.appendChild(btnDelete);
-
-        tr.appendChild(tdActions);
-        casesTableBody.appendChild(tr);
       });
-    }
+      li.appendChild(delBtn);
 
-    function renderOfficers() {
-      const officers = OfficerManager.getOfficers();
-      officerList.innerHTML = '';
-      if (officers.length === 0) {
-        officerList.innerHTML = '<li>No officers added yet.</li>';
-      } else {
-        officers.forEach(o => {
-          const li = document.createElement('li');
-          li.textContent = o;
-          const btnDel = document.createElement('button');
-          btnDel.textContent = 'Remove';
-          btnDel.setAttribute('aria-label', `Remove officer ${o}`);
-          btnDel.addEventListener('click', () => {
-            if (confirm(`Remove officer "${o}"? All cases assigned to them will remain.`)) {
-              OfficerManager.removeOfficer(o);
-              renderAll();
-            }
-          });
-          li.appendChild(btnDel);
-          officerList.appendChild(li);
-        });
-      }
-      // Update officer filter dropdown
-      populateOfficerFilter(officers);
-    }
-
-    function populateOfficerFilter(officers) {
-      filterOfficer.innerHTML = '<option value="">All Officers</option>';
-      officers.forEach(o => {
-        const opt = document.createElement('option');
-        opt.value = o;
-        opt.textContent = o;
-        filterOfficer.appendChild(opt);
-      });
-    }
-
-    function renderProgress() {
-      const allCases = CaseManager.getCases();
-      const total = allCases.length;
-      const completed = allCases.filter(c => ['Resolved', 'Closed'].includes(c.status)).length;
-      const percent = total === 0 ? 0 : Math.round((completed / total) * 100);
-      progressText.textContent = `${completed} of ${total} cases completed (${percent}%)`;
-      progressBar.style.width = percent + '%';
-      progressBar.setAttribute('aria-valuenow', percent);
-    }
-
-    function renderBreakdown() {
-      const cases = CaseManager.getCases();
-      const typeCounts = {};
-      cases.forEach(c => {
-        typeCounts[c.type] = (typeCounts[c.type] || 0) + 1;
-      });
-      const types = Object.keys(typeCounts).sort();
-      if (types.length === 0) {
-        breakdownContainer.innerHTML = '<p>No cases to display breakdown.</p>';
-        return;
-      }
-      breakdownContainer.innerHTML = '';
-      types.forEach(type => {
-        const count = typeCounts[type];
-        const percent = Math.round((count / cases.length) * 100);
-        const item = document.createElement('div');
-        item.className = 'breakdown-item';
-        const label = document.createElement('div');
-        label.className = 'breakdown-label';
-        label.textContent = `${type} — ${count} cases (${percent}%)`;
-        const bar = document.createElement('div');
-        bar.className = 'breakdown-bar';
-        bar.style.width = percent + '%';
-        item.appendChild(label);
-        item.appendChild(bar);
-        breakdownContainer.appendChild(item);
-      });
-    }
-
-    function renderLeaderboard() {
-      const officers = OfficerManager.getOfficers();
-      const cases = CaseManager.getCases();
-      const stats = Leaderboard.calculate(cases, officers);
-      leaderboardBody.innerHTML = '';
-      if (stats.length === 0) {
-        leaderboardBody.innerHTML = '<tr><td colspan="4" style="text-align:center; font-style:italic;">No officers yet.</td></tr>';
-        return;
-      }
-      stats.forEach(({ officer, assignedCount, completedCount, efficiency }) => {
-        const tr = document.createElement('tr');
-        tr.innerHTML = `
-          <td>${officer}</td>
-          <td>${assignedCount}</td>
-          <td>${completedCount}</td>
-          <td>${(efficiency * 100).toFixed(0)}%</td>
-        `;
-        leaderboardBody.appendChild(tr);
-      });
-    }
-
-    // --- Form handling ---
-    function clearCaseForm() {
-      caseIdInput.value = '';
-      caseTypeSelect.value = '';
-      caseStatusSelect.value = '';
-      caseOfficerInput.value = '';
-      caseDueInput.value = '';
-      caseFollowupCheckbox.checked = false;
-      caseBanDurationInput.value = '';
-      caseSeveritySelect.value = '';
-      blackreportFields.style.display = 'none';
-      editingIndex = -1;
-      formTitle.textContent = 'Add New Case';
-      formSubmit.textContent = 'Add Case';
-      formCancel.style.display = 'none';
-      caseIdInput.disabled = false;
-    }
-
-    function fillCaseForm(caseData) {
-      caseIdInput.value = caseData.id;
-      caseTypeSelect.value = caseData.type;
-      caseStatusSelect.value = caseData.status;
-      caseOfficerInput.value = caseData.officer;
-      caseDueInput.value = caseData.dueDate;
-      caseFollowupCheckbox.checked = caseData.followUp;
-      if (caseData.type === 'Blackreport') {
-        blackreportFields.style.display = 'block';
-        caseBanDurationInput.value = caseData.banDuration || '';
-        caseSeveritySelect.value = caseData.severity || '';
-      } else {
-        blackreportFields.style.display = 'none';
-        caseBanDurationInput.value = '';
-        caseSeveritySelect.value = '';
-      }
-      editingIndex = caseData.id;
-      formTitle.textContent = `Edit Case ${caseData.id}`;
-      formSubmit.textContent = 'Update Case';
-      formCancel.style.display = 'inline-block';
-      caseIdInput.disabled = true;
-    }
-
-    function startEditCase(caseId) {
-      const cases = CaseManager.getCases();
-      const caseData = cases.find(c => c.id === caseId);
-      if (!caseData) {
-        alert('Case not found.');
-        return;
-      }
-      fillCaseForm(caseData);
-      window.scrollTo({ top: 0, behavior: 'smooth' });
-    }
-
-    function handleCaseTypeChange() {
-      if (caseTypeSelect.value === 'Blackreport') {
-        blackreportFields.style.display = 'block';
-        caseBanDurationInput.required = true;
-        caseSeveritySelect.required = true;
-      } else {
-        blackreportFields.style.display = 'none';
-        caseBanDurationInput.required = false;
-        caseSeveritySelect.required = false;
-        caseBanDurationInput.value = '';
-        caseSeveritySelect.value = '';
-      }
-    }
-
-    // --- Main render/update function ---
-    function renderAll() {
-      const searchTerm = caseSearch.value.trim();
-      const filterCrit = {
-        type: filterType.value || null,
-        status: filterStatus.value || null,
-        officer: filterOfficer.value || null,
-      };
-
-      let filteredCases = CaseManager.getCases();
-
-      if (searchTerm) {
-        filteredCases = CaseManager.searchCases(searchTerm);
-      }
-      if (filterCrit.type || filterCrit.status || filterCrit.officer) {
-        filteredCases = filteredCases.filter(c => {
-          if (filterCrit.type && c.type !== filterCrit.type) return false;
-          if (filterCrit.status && c.status !== filterCrit.status) return false;
-          if (filterCrit.officer && c.officer !== filterCrit.officer) return false;
-          return true;
-        });
-      }
-
-      renderCasesTable(filteredCases);
-      renderProgress();
-      renderBreakdown();
-      renderOfficers();
-      renderLeaderboard();
-    }
-
-    // --- Event Listeners ---
-    loginForm.addEventListener('submit', e => {
-      e.preventDefault();
-      loginError.textContent = '';
-      const username = loginForm.username.value.trim();
-      const password = loginForm.password.value.trim();
-      if (LoginModule.authenticate(username, password)) {
-        loginContainer.style.display = 'none';
-        appContainer.style.display = 'block';
-        renderAll();
-      } else {
-        loginError.textContent = 'Invalid username or password.';
-      }
+      officerList.appendChild(li);
     });
+  }
 
-    logoutBtn.addEventListener('click', () => {
-      if (confirm('Log out?')) {
-        LoginModule.logout();
-        appContainer.style.display = 'none';
-        loginContainer.style.display = 'block';
-        loginForm.reset();
-      }
-    });
-
-    caseForm.addEventListener('submit', e => {
-      e.preventDefault();
-      try {
-        const newCase = CaseModel.createCase({
-          id: caseIdInput.value.trim(),
-          type: caseTypeSelect.value,
-          status: caseStatusSelect.value,
-          officer: caseOfficerInput.value.trim(),
-          dueDate: caseDueInput.value,
-          followUp: caseFollowupCheckbox.checked,
-          banDuration: caseTypeSelect.value === 'Blackreport' ? Number(caseBanDurationInput.value) : null,
-          severity: caseTypeSelect.value === 'Blackreport' ? caseSeveritySelect.value : null,
-        });
-
-        if (editingIndex === -1) {
-          CaseManager.addCase(newCase);
-          alert(`Case "${newCase.id}" added.`);
-        } else {
-          CaseManager.editCase(editingIndex, newCase);
-          alert(`Case "${newCase.id}" updated.`);
-        }
-        clearCaseForm();
-        renderAll();
-      } catch (err) {
-        alert(err.message);
-      }
-    });
-
-    formCancel.addEventListener('click', () => {
-      clearCaseForm();
-    });
-
-    caseTypeSelect.addEventListener('change', () => {
-      handleCaseTypeChange();
-    });
-
-    filterType.addEventListener('change', renderAll);
-    filterStatus.addEventListener('change', renderAll);
-    filterOfficer.addEventListener('change', renderAll);
-    caseSearch.addEventListener('input', () => {
-      // Debounce not needed here for simplicity
-      renderAll();
-    });
-    clearFilters.addEventListener('click', () => {
-      filterType.value = '';
-      filterStatus.value = '';
-      filterOfficer.value = '';
-      caseSearch.value = '';
-      renderAll();
-    });
-
-    officerForm.addEventListener('submit', e => {
-      e.preventDefault();
-      const name = officerNameInput.value.trim();
-      if (!name) {
-        alert('Officer name cannot be empty.');
-        return;
-      }
-      try {
-        OfficerManager.addOfficer(name);
-        alert(`Officer "${name}" added.`);
-        officerNameInput.value = '';
-        renderAll();
-      } catch (err) {
-        alert(err.message);
-      }
-    });
-
-    // --- Init on page load ---
-    function init() {
-      // Load saved data or init empty
-      CaseManager.init(JSON.parse(localStorage.getItem('ia_cases')) || []);
-      OfficerManager.init(JSON.parse(localStorage.getItem('ia_officers')) || []);
-
-      if (LoginModule.isLoggedIn()) {
-        loginContainer.style.display = 'none';
-        appContainer.style.display = 'block';
-        renderAll();
-      } else {
-        loginContainer.style.display = 'block';
-        appContainer.style.display = 'none';
-      }
+  // Add Officer Form Submit
+  document.getElementById('officer-form').addEventListener('submit', e => {
+    e.preventDefault();
+    const input = document.getElementById('officer-name');
+    const name = input.value.trim();
+    if (name === '') {
+      alert('Officer name cannot be empty.');
+      return;
     }
-
-    return { init };
-  })();
-
-  window.addEventListener('DOMContentLoaded', () => {
-    app.init();
+    if (officers.includes(name)) {
+      alert('Officer already exists.');
+      return;
+    }
+    officers.push(name);
+    input.value = '';
+    saveData();
+    renderAll();
   });
+
+  // Show/hide Blackreport extra fields depending on type
+  caseTypeSelect.addEventListener('change', () => {
+    if (caseTypeSelect.value.toLowerCase() === 'blackreport') {
+      blackreportExtra.style.display = 'block';
+      banDurationInput.required = true;
+      severitySelect.required = true;
+    } else {
+      blackreportExtra.style.display = 'none';
+      banDurationInput.required = false;
+      severitySelect.required = false;
+    }
+  });
+
+  // Add or Update Case Form Submit
+  caseForm.addEventListener('submit', e => {
+    e.preventDefault();
+    const id = caseIdInput.value.trim();
+    const type = caseTypeSelect.value;
+    const status = caseStatusSelect.value;
+    const officer = caseOfficerInput.value.trim() || "Unassigned";
+    const due = caseDueInput.value;
+    const followup = caseFollowupCheckbox.checked;
+
+    if (!id || !type || !status || !due) {
+      alert('Please fill in all required fields.');
+      return;
+    }
+
+    // If Blackreport type, check extra fields
+    if (type.toLowerCase() === 'blackreport') {
+      const banDuration = banDurationInput.value;
+      const severity = severitySelect.value;
+      if (!banDuration || !severity) {
+        alert('Please fill in Blackreport ban duration and severity.');
+        return;
+      }
+      // Save blackreport details for this case id
+      blackreportDetails[id] = { banDuration: parseInt(banDuration), severity };
+    } else {
+      // Remove blackreport details if exists for this id
+      if (blackreportDetails[id]) delete blackreportDetails[id];
+    }
+
+    // Editing existing case or adding new
+    const editIndex = parseInt(editIndexInput.value);
+    if (editIndex >= 0) {
+      // Update case
+      cases[editIndex] = { id, type, status, officer, due, followup };
+    } else {
+      // Check duplicate id
+      if (cases.find(c => c.id === id)) {
+        alert('Case ID already exists. Please choose a unique ID.');
+        return;
+      }
+      cases.push({ id, type, status, officer, due, followup });
+    }
+    saveData();
+    resetForm();
+    renderAll();
+  });
+
+  // Reset form to add mode
+  function resetForm() {
+    formTitle.textContent = 'Add New Case';
+    formSubmitBtn.textContent = 'Add Case';
+    formCancelBtn.style.display = 'none';
+    editIndexInput.value = '-1';
+    caseForm.reset();
+    blackreportExtra.style.display = 'none';
+  }
+  formCancelBtn.addEventListener('click', resetForm);
+
+  // Start editing a case
+  function startEditCase(idx) {
+    const c = cases[idx];
+    formTitle.textContent = `Edit Case ${c.id}`;
+    formSubmitBtn.textContent = 'Update Case';
+    formCancelBtn.style.display = 'inline-block';
+    editIndexInput.value = idx;
+
+    caseIdInput.value = c.id;
+    caseTypeSelect.value = c.type;
+    caseStatusSelect.value = c.status;
+    caseOfficerInput.value = c.officer;
+    caseDueInput.value = c.due;
+    caseFollowupCheckbox.checked = c.followup;
+
+    if (c.type.toLowerCase() === 'blackreport') {
+      blackreportExtra.style.display = 'block';
+      const br = blackreportDetails[c.id];
+      if (br) {
+        banDurationInput.value = br.banDuration;
+        severitySelect.value = br.severity;
+      } else {
+        banDurationInput.value = '';
+        severitySelect.value = '';
+      }
+    } else {
+      blackreportExtra.style.display = 'none';
+      banDurationInput.value = '';
+      severitySelect.value = '';
+    }
+  }
+
+  // Delete case
+  function deleteCase(idx) {
+    if (confirm(`Delete case ${cases[idx].id}?`)) {
+      // Remove blackreport details if exist
+      if (blackreportDetails[cases[idx].id]) delete blackreportDetails[cases[idx].id];
+      cases.splice(idx, 1);
+      saveData();
+      renderAll();
+    }
+  }
+
+  // Render All cases/officers/progress/breakdown
+  function renderAll() {
+    renderCases();
+    renderProgress();
+    renderBreakdown();
+    renderOfficers();
+    renderTasks();
+    renderTicketLeaderboard();
+  }
+
+  // ----- TASKS & TICKETS PAGE -----
+
+  const tasksTbody = document.getElementById('tasks-tbody');
+  const ticketLeaderboard = document.getElementById('ticket-leaderboard');
+
+  // Render Tasks Table with checkbox per officer
+  function renderTasks() {
+    tasksTbody.innerHTML = '';
+
+    if (officers.length === 0) {
+      const tr = document.createElement('tr');
+      const td = document.createElement('td');
+      td.colSpan = 3;
+      td.textContent = 'No officers available. Please add officers on the Cases page.';
+      td.style.textAlign = 'center';
+      tr.appendChild(td);
+      tasksTbody.appendChild(tr);
+      return;
+    }
+
+    tasks.forEach(task => {
+      // Assign task to an officer for demo: rotate assignment based on task id index
+      const assignedOfficer = officers[parseInt(task.id.slice(1)) % officers.length];
+
+      const tr = document.createElement('tr');
+
+      // Task Name
+      const tdName = document.createElement('td');
+      tdName.textContent = task.name;
+      tdName.setAttribute('data-label', 'Task');
+      tr.appendChild(tdName);
+
+      // Assigned Officer
+      const tdAssigned = document.createElement('td');
+      tdAssigned.textContent = assignedOfficer;
+      tdAssigned.setAttribute('data-label', 'Assigned To');
+      tr.appendChild(tdAssigned);
+
+      // Completed Checkbox
+      const tdCompleted = document.createElement('td');
+      tdCompleted.setAttribute('data-label', 'Completed');
+      const checkbox = document.createElement('input');
+      checkbox.type = 'checkbox';
+      checkbox.checked = completedTasks[assignedOfficer]?.includes(task.id) || false;
+      checkbox.addEventListener('change', () => {
+        if (!completedTasks[assignedOfficer]) completedTasks[assignedOfficer] = [];
+        if (checkbox.checked) {
+          if (!completedTasks[assignedOfficer].includes(task.id)) {
+            completedTasks[assignedOfficer].push(task.id);
+          }
+        } else {
+          completedTasks[assignedOfficer] = completedTasks[assignedOfficer].filter(tid => tid !== task.id);
+        }
+        localStorage.setItem('ia_completedTasks', JSON.stringify(completedTasks));
+        renderTasks();
+      });
+      tdCompleted.appendChild(checkbox);
+      tr.appendChild(tdCompleted);
+
+      tasksTbody.appendChild(tr);
+    });
+  }
+
+  // Render Ticket Leaderboard (officers by how many tickets answered)
+  function renderTicketLeaderboard() {
+    ticketLeaderboard.innerHTML = '';
+    const ticketCounts = {};
+    cases.forEach(c => {
+      if (c.officer && c.officer !== 'Unassigned') {
+        ticketCounts[c.officer] = (ticketCounts[c.officer] || 0) + 1;
+      }
+    });
+    const sorted = Object.entries(ticketCounts).sort((a, b) => b[1] - a[1]);
+    if (sorted.length === 0) {
+      ticketLeaderboard.textContent = 'No tickets assigned yet.';
+      return;
+    }
+    sorted.forEach(([officer, count]) => {
+      const li = document.createElement('li');
+      li.textContent = `${officer}: ${count} tickets answered`;
+      ticketLeaderboard.appendChild(li);
+    });
+  }
+
+  // Navigation Button Click Handlers
+  btnCases.addEventListener('click', () => {
+    casesPage.style.display = 'block';
+    tasksPage.style.display = 'none';
+    btnCases.setAttribute('aria-pressed', 'true');
+    btnTasks.setAttribute('aria-pressed', 'false');
+  });
+
+  btnTasks.addEventListener('click', () => {
+    casesPage.style.display = 'none';
+    tasksPage.style.display = 'block';
+    btnCases.setAttribute('aria-pressed', 'false');
+    btnTasks.setAttribute('aria-pressed', 'true');
+  });
+
+  // Initial render
+  renderAll();
 </script>
 
 </body>
 </html>
-
-<!DOCTYPE html>
-<html lang="en">
-<head>
-<meta charset="UTF-8" />
-<meta name="viewport" content="width=device-width, initial-scale=1" />
-<title>Internal Affairs Dashboard with Tasks</title>
-<style>
-  /* --- Base styles --- */
-  body {
-    font-family: Arial, sans-serif;
-    background: #f5f7fa;
-    margin: 0; padding: 0;
-  }
-  header {
-    background: #4D8076;
-    color: white;
-    padding: 1rem 1.5rem;
-    display: flex;
-    align-items: center;
-    justify-content: space-between;
-  }
-  header h1 {
-    margin: 0;
-    font-size: 1.5rem;
-  }
-  nav button {
-    background: #4D7BA7;
-    border: none;
-    padding: 0.5rem 1rem;
-    margin-left: 0.5rem;
-    color: white;
-    cursor: pointer;
-    font-weight: bold;
-    border-radius: 4px;
-    transition: background-color 0.25s;
-  }
-  nav button.active, nav button:hover {
-    background: #35617a;
-  }
-
-  main {
-    padding: 1rem 1.5rem;
-  }
-  /* --- Login styles --- */
-  #login-container {
-    max-width: 350px;
-    margin: 3rem auto;
-    background: white;
-    padding: 2rem;
-    border-radius: 8px;
-    box-shadow: 0 0 15px #ccc;
-  }
-  #login-container h2 {
-    margin-top: 0;
-    margin-bottom: 1rem;
-    text-align: center;
-    color: #4D8076;
-  }
-  #login-form label {
-    display: block;
-    margin-top: 1rem;
-    font-weight: bold;
-  }
-  #login-form input {
-    width: 100%;
-    padding: 0.5rem;
-    margin-top: 0.25rem;
-    box-sizing: border-box;
-  }
-  #login-form button {
-    margin-top: 1.5rem;
-    width: 100%;
-    padding: 0.75rem;
-    background: #4D7BA7;
-    color: white;
-    border: none;
-    cursor: pointer;
-    font-weight: bold;
-    border-radius: 4px;
-  }
-  #login-error {
-    color: red;
-    margin-top: 0.5rem;
-    text-align: center;
-  }
-
-  /* --- General table styles --- */
-  table {
-    width: 100%;
-    border-collapse: collapse;
-    margin-top: 1rem;
-  }
-  th, td {
-    border: 1px solid #ddd;
-    padding: 0.5rem;
-    text-align: left;
-  }
-  th {
-    background: #4D8076;
-    color: white;
-  }
-  button {
-    cursor: pointer;
-  }
-  button:focus {
-    outline: 2px solid #35617a;
-  }
-  .badge {
-    padding: 0.2rem 0.5rem;
-    border-radius: 4px;
-    color: white;
-    font-weight: bold;
-    font-size: 0.85rem;
-    display: inline-block;
-    user-select: none;
-  }
-  .badge.open { background-color: #228B22; }
-  .badge.pending { background-color: #DAA520; }
-  .badge.resolved { background-color: #1E90FF; }
-  .badge.closed { background-color: #555; }
-
-  /* --- Progress bar --- */
-  #progress-container {
-    margin-top: 1rem;
-    background: #ddd;
-    border-radius: 10px;
-    height: 20px;
-    overflow: hidden;
-  }
-  #progress-bar {
-    height: 100%;
-    background: #4D7BA7;
-    width: 0;
-    transition: width 0.5s;
-  }
-  #progress-text {
-    margin-top: 0.25rem;
-    font-weight: bold;
-    color: #4D8076;
-  }
-
-  /* --- Case form --- */
-  form {
-    margin-top: 1rem;
-    background: white;
-    padding: 1rem;
-    border-radius: 8px;
-    box-shadow: 0 0 10px #ccc;
-  }
-  form > div {
-    margin-bottom: 0.8rem;
-  }
-  label {
-    font-weight: bold;
-    display: block;
-    margin-bottom: 0.25rem;
-  }
-  input[type=text], input[type=number], input[type=date], select {
-    width: 100%;
-    padding: 0.4rem;
-    box-sizing: border-box;
-    border-radius: 4px;
-    border: 1px solid #aaa;
-  }
-  input[type=checkbox] {
-    transform: scale(1.2);
-    margin-right: 0.5rem;
-  }
-  form button {
-    background: #4D8076;
-    color: white;
-    border: none;
-    padding: 0.6rem 1.2rem;
-    font-weight: bold;
-    border-radius: 5px;
-  }
-  form button:hover {
-    background: #35617a;
-  }
-  #form-cancel {
-    margin-left: 0.5rem;
-    background: #b22222;
-  }
-
-  /* --- Officer list --- */
-  #officer-list {
-    list-style: none;
-    padding-left: 0;
-  }
-  #officer-list li {
-    background: white;
-    margin-bottom: 0.5rem;
-    padding: 0.5rem 0.8rem;
-    border-radius: 6px;
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-  }
-  #officer-list button {
-    background: #b22222;
-    border: none;
-    color: white;
-    padding: 0.3rem 0.6rem;
-    border-radius: 4px;
-    font-size: 0.85rem;
-  }
-
-  /* --- Case breakdown bars --- */
-  #breakdown-container {
-    margin-top: 1rem;
-  }
-  .breakdown-item {
-    margin-bottom: 0.5rem;
-  }
-  .breakdown-label {
-    font-weight: bold;
-    margin-bottom: 0.25rem;
-  }
-  .breakdown-bar {
-    height: 14px;
-    background: #4D7BA7;
-    border-radius: 6px;
-  }
-
-  /* --- Leaderboard --- */
-  #leaderboard {
-    margin-top: 2rem;
-  }
-  #leaderboard table {
-    width: 100%;
-  }
-  #leaderboard th {
-    background: #35617a;
-  }
-
-  /* --- Hidden sections --- */
-  .hidden {
-    display: none;
-  }
-
-  /* --- Blackreport extra fields --- */
-  #blackreport-fields {
-    margin-top: 0.5rem;
-    padding: 0.75rem;
-    background: #f1f8f7;
-    border-radius: 6px;
-    border: 1px solid #4D8076;
-  }
-
-  /* --- Tasks page styles --- */
-  #tasks-page {
-    display: none;
-  }
-  #tasks-page h2 {
-    color: #4D8076;
-  }
-  #tasks-list {
-    list-style: none;
-    padding-left: 0;
-    max-width: 600px;
-  }
-  #tasks-list li {
-    background: white;
-    margin-bottom: 0.5rem;
-    padding: 0.6rem 1rem;
-    border-radius: 6px;
-    display: flex;
-    align-items: center;
-    justify-content: space-between;
-  }
-  #tasks-list label {
-    cursor: pointer;
-    flex-grow: 1;
-  }
-  #tasks-list input[type=checkbox] {
-    margin-right: 1rem;
-    transform: scale(1.3);
-  }
-
-  /* Task performance table */
-  #task-performance-table {
-    margin-top: 1.5rem;
-    width: 100%;
-    max-width: 600px;
-    border-collapse: collapse;
-  }
-  #task-performance-table th, #task-performance-table td {
-    border: 1px solid #ddd;
-    padding: 0.5rem;
-    text-align: center;
-  }
-  #task-performance-table th {
-    background: #4D8076;
-    color: white;
-  }
-
-  /* Tickets answered summary */
-  #tickets-summary {
-    margin-top: 2rem;
-    max-width: 600px;
-  }
-  #tickets-summary h3 {
-    color: #4D8076;
-  }
-  #tickets-summary table {
-    width: 100%;
-    border-collapse: collapse;
-  }
-  #tickets-summary th, #tickets-summary td {
-    border: 1px solid #ddd;
-    padding: 0.5rem;
-    text-align: center;
-  }
-  #tickets-summary th {
-    background: #4D8076;
-    color: white;
-  }
-
-  /* Responsive */
-  @media (max-width: 700px) {
-    table, #task-performance-table, #tickets-summary table {
-      font-size: 0.9rem;
-    }
-    nav {
-      flex-wrap: wrap;
-    }
-    nav button {
-      margin-top: 0.5rem;
-    }
-  }
-</style>
-</head>
-<body>
-
-<header>
-  <h1>Internal Affairs Dashboard</h1>
-  <nav>
-    <button id="nav-cases" class="active" aria-current="page">Cases</button>
-    <button id="nav-tasks">Tasks & Performance</button>
-    <button id="logout-btn" style="background:#b22222;">Logout</button>
-  </nav>
-</header>
-
-<!-- Login container -->
-<div id="login-container" role="main" aria-label="Login form container">
-  <h2>Login</h2>
-  <form id="login-form" aria-describedby="login-error">
-    <label for="username">Username</label>
-    <input type="text" id="username" name="username" autocomplete="username" required />
-
-    <label for="password">Password</label>
-    <input type="password" id="password" name="password" autocomplete="current-password" required />
-
-    <button type="submit">Log In</button>
-    <div id="login-error" role="alert" aria-live="assertive"></div>
-  </form>
-</div>
-
-<!-- Main app container -->
-<main id="app" class="hidden" role="main" aria-label="Internal affairs management">
-
-  <!-- Cases Page -->
-  <section id="cases-page" aria-label="Cases management">
-    <h2>Cases Management</h2>
-
-    <!-- Progress bar -->
-    <div id="progress-text" aria-live="polite"></div>
-    <div id="progress-container" role="progressbar" aria-valuemin="0" aria-valuemax="100">
-      <div id="progress-bar"></div>
-    </div>
-
-    <!-- Filters -->
-    <form id="filters-form" aria-label="Filter cases" style="margin-top: 1rem; max-width: 600px; display: flex; gap: 0.5rem; flex-wrap: wrap;">
-      <select id="filter-type" aria-label="Filter by case type">
-        <option value="">All Types</option>
-        <option value="Blackreport">Blackreport</option>
-        <option value="Normal">Normal</option>
-        <option value="Abuse">Abuse</option>
-        <option value="Misconduct">Misconduct</option>
-      </select>
-      <select id="filter-status" aria-label="Filter by status">
-        <option value="">All Status</option>
-        <option value="Open">Open</option>
-        <option value="Pending">Pending</option>
-        <option value="Resolved">Resolved</option>
-        <option value="Closed">Closed</option>
-      </select>
-      <select id="filter-officer" aria-label="Filter by assigned officer">
-        <option value="">All Officers</option>
-      </select>
-      <input type="search" id="case-search" placeholder="Search cases..." aria-label="Search cases by ID, type, status or officer" style="flex-grow: 1; min-width: 150px;" />
-      <button type="button" id="clear-filters" aria-label="Clear all filters">Clear</button>
-    </form>
-
-    <!-- Cases Table -->
-    <table aria-label="Cases table" id="cases-table">
-      <thead>
-        <tr>
-          <th>Case ID</th>
-          <th>Type</th>
-          <th>Status</th>
-          <th>Assigned Officer</th>
-          <th>Due Date</th>
-          <th>Follow-up</th>
-          <th>Actions</th>
-        </tr>
-      </thead>
-      <tbody id="cases-tbody"></tbody>
-    </table>
-
-    <!-- Case Form -->
-    <form id="case-form" aria-label="Add or edit case">
-      <h3 id="form-title">Add New Case</h3>
-
-      <div>
-        <label for="case-id">Case ID</label>
-        <input type="text" id="case-id" required autocomplete="off" />
-      </div>
-      <div>
-        <label for="case-type">Case Type</label>
-        <select id="case-type" required>
-          <option value="">Select type</option>
-          <option value="Normal">Normal</option>
-          <option value="Blackreport">Blackreport</option>
-          <option value="Abuse">Abuse</option>
-          <option value="Misconduct">Misconduct</option>
-        </select>
-      </div>
-      <div>
-        <label for="case-status">Status</label>
-        <select id="case-status" required>
-          <option value="Open">Open</option>
-          <option value="Pending">Pending</option>
-          <option value="Resolved">Resolved</option>
-          <option value="Closed">Closed</option>
-        </select>
-      </div>
-      <div>
-        <label for="case-officer">Assigned Officer</label>
-        <input type="text" id="case-officer" list="officers-datalist" autocomplete="off" />
-        <datalist id="officers-datalist"></datalist>
-      </div>
-      <div>
-        <label for="case-due">Due Date</label>
-        <input type="date" id="case-due" />
-      </div>
-      <div>
-        <label>
-          <input type="checkbox" id="case-followup" />
-          Follow-up required
-        </label>
-      </div>
-
-      <div id="blackreport-fields" class="hidden" aria-live="polite">
-        <div>
-          <label for="case-ban-duration">Ban Duration (days)</label>
-          <input type="number" id="case-ban-duration" min="1" />
-        </div>
-        <div>
-          <label for="case-severity">Severity</label>
-          <select id="case-severity">
-            <option value="">Select severity</option>
-            <option value="Low">Low</option>
-            <option value="Medium">Medium</option>
-            <option value="High">High</option>
-            <option value="Critical">Critical</option>
-          </select>
-        </div>
-      </div>
-
-      <button type="submit" id="form-submit">Add Case</button>
-      <button type="button" id="form-cancel" class="hidden">Cancel</button>
-    </form>
-
-    <!-- Officers -->
-    <section id="officers-section" aria-label="Officers management" style="margin-top: 2rem; max-width: 400px;">
-      <h3>Officers</h3>
-      <ul id="officer-list" aria-live="polite" aria-relevant="additions removals"></ul>
-      <form id="officer-form" aria-label="Add new officer" style="margin-top: 0.5rem;">
-        <input type="text" id="officer-name" placeholder="New officer name" autocomplete="off" required />
-        <button type="submit">Add Officer</button>
-      </form>
-    </section>
-
-    <!-- Breakdown -->
-    <section id="breakdown-container" aria-label="Case type breakdown"></section>
-
-    <!-- Leaderboard -->
-    <section id="leaderboard" aria-label="Officer leaderboard">
-      <h3>Officer Leaderboard</h3>
-      <table>
-        <thead>
-          <tr>
-            <th>Officer</th>
-            <th>Assigned Cases</th>
-            <th>Completed Cases</th>
-            <th>Efficiency</th>
-          </tr>
-        </thead>
-        <tbody id="leaderboard-body"></tbody>
-      </table>
-    </section>
-  </section>
-
-  <!-- Tasks Page -->
-  <section id="tasks-page" aria-label="Tasks and performance management">
-    <h2>Tasks & Performance</h2>
-
-    <p>Mark tasks completed by each officer and view their performance based on task completion and tickets answered.</p>
-
-    <!-- Tasks List -->
-    <ul id="tasks-list" aria-live="polite" aria-relevant="additions">
-      <!-- Dynamically filled -->
-    </ul>
-
-    <!-- Task Completion Performance Table -->
-    <table id="task-performance-table" aria-label="Officer task completion performance">
-      <thead>
-        <tr>
-          <th>Officer</th>
-          <th>Tasks Completed</th>
-          <th>Total Tasks</th>
-          <th>Task Completion %</th>
-        </tr>
-      </thead>
-      <tbody>
-        <!-- Filled dynamically -->
-      </tbody>
-    </table>
-
-    <!-- Tickets Answered Summary -->
-    <section id="tickets-summary" aria-label="Tickets answered summary">
-      <h3>Tickets Answered Per Officer</h3>
-      <table aria-describedby="tickets-summary">
-        <thead>
-          <tr>
-            <th>Officer</th>
-            <th>Tickets Answered</th>
-          </tr>
-        </thead>
-        <tbody>
