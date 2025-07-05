@@ -1,510 +1,643 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="en" >
 <head>
-<meta charset="UTF-8" />
-<meta name="viewport" content="width=device-width, initial-scale=1" />
-<title>Internal Affairs Case Tracking Dashboard</title>
-<style>
-  /* Reset & base */
-  *, *::before, *::after {
-    box-sizing: border-box;
-  }
-  body {
-    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Helvetica, Arial, sans-serif, 
-      "Apple Color Emoji", "Segoe UI Emoji", "Segoe UI Symbol";
-    line-height: 1.5;
-    margin: 1rem auto;
-    max-width: 960px;
-    padding: 0 1rem 3rem;
-    color: #24292e;
-    background-color: #f6f8fa;
-  }
-  h1, h2, h3 {
-    font-weight: 600;
-    margin-top: 2rem;
-    margin-bottom: 1rem;
-    color: #24292e;
-  }
-  h1 {
-    font-size: 2rem;
-  }
-  h2 {
-    font-size: 1.5rem;
-  }
-  h3 {
-    font-size: 1.25rem;
-  }
-  /* Progress bar container */
-  .progress-container {
-    background: #e1e4e8;
-    border-radius: 8px;
-    overflow: hidden;
-    margin: 0.5rem 0 2rem;
-    height: 20px;
-  }
-  .progress-bar {
-    background: #2ea44f;
-    height: 100%;
-    width: 0%;
-    transition: width 0.5s ease-in-out;
-  }
-  /* Table styles */
-  table {
-    width: 100%;
-    border-collapse: collapse;
-    margin-bottom: 2rem;
-  }
-  thead {
-    background-color: #f6f8fa;
-    border-bottom: 1px solid #d1d5da;
-  }
-  th, td {
-    padding: 0.75rem 1rem;
-    text-align: left;
-    border-bottom: 1px solid #d1d5da;
-    vertical-align: middle;
-  }
-  th {
-    cursor: pointer;
-    user-select: none;
-    position: relative;
-  }
-  th:after {
-    content: '⬍';
-    font-size: 0.8rem;
-    position: absolute;
-    right: 0.8rem;
-    color: #6a737d;
-  }
-  tbody tr:hover {
-    background-color: #f1f8ff;
-  }
-  /* Badge styles */
-  .badge {
-    display: inline-block;
-    padding: 0.15em 0.5em;
-    font-size: 0.75rem;
-    font-weight: 600;
-    border-radius: 2em;
-    color: white;
-    vertical-align: middle;
-    user-select: none;
-  }
-  .badge-open { background-color: #d73a49; }       /* Red */
-  .badge-pending { background-color: #dbab09; }    /* Yellow */
-  .badge-resolved { background-color: #2ea44f; }   /* Green */
-  .badge-closed { background-color: #6a737d; }     /* Gray */
-  .badge-overdue { background-color: #ff6f6f; }    /* Bright red */
-  .badge-followup { background-color: #0366d6; }   /* Blue */
-  .badge-top-performer { background-color: #f9a825; } /* Gold */
-
-  /* Case type bars container */
-  .case-type-bar {
-    height: 1.25rem;
-    background-color: #e1e4e8;
-    border-radius: 6px;
-    overflow: hidden;
-    width: 10rem;
-    margin-left: 0.5rem;
-    vertical-align: middle;
-    display: inline-block;
-  }
-  .case-type-bar-fill {
-    height: 100%;
-    background-color: #2ea44f;
-    border-radius: 6px 0 0 6px;
-  }
-
-  /* Officer performance progress */
-  .performance-bar {
-    height: 1rem;
-    background-color: #e1e4e8;
-    border-radius: 6px;
-    overflow: hidden;
-    width: 8rem;
-    display: inline-block;
-    vertical-align: middle;
-    margin-left: 0.5rem;
-  }
-  .performance-bar-fill {
-    height: 100%;
-    background-color: #0366d6;
-    border-radius: 6px 0 0 6px;
-  }
-
-  /* Responsive */
-  @media (max-width: 600px) {
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
+  <title>Internal Affairs — iPhone Style Dashboard</title>
+  <style>
+    /* iOS Inspired system fonts */
     body {
-      margin: 0.5rem;
-      padding: 0 0.5rem 2rem;
-      max-width: 100%;
+      margin: 0; 
+      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Oxygen,
+        Ubuntu, Cantarell, "Open Sans", "Helvetica Neue", sans-serif;
+      background: #f2f2f7;
+      color: #1c1c1e;
+      -webkit-font-smoothing: antialiased;
+      -moz-osx-font-smoothing: grayscale;
+      line-height: 1.45;
+      min-height: 100vh;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      padding: env(safe-area-inset-top) 1rem 3rem;
     }
-    table, thead, tbody, th, td, tr {
-      display: block;
+    h1, h2, h3 {
+      font-weight: 600;
+      margin: 1rem 0 0.5rem;
+      letter-spacing: -0.015em;
+      color: #1c1c1e;
     }
-    thead tr {
-      display: none;
+    h1 {
+      font-size: 1.8rem;
+      text-align: center;
     }
-    tbody tr {
-      margin-bottom: 1rem;
-      border: 1px solid #d1d5da;
-      border-radius: 8px;
-      padding: 0.5rem;
-      background-color: white;
+    h2 {
+      font-size: 1.3rem;
     }
-    tbody td {
-      border: none;
-      padding: 0.25rem 0;
+    h3 {
+      font-size: 1.1rem;
+    }
+    /* Card container */
+    section {
+      background: white;
+      width: 100%;
+      max-width: 600px;
+      margin: 1rem auto;
+      border-radius: 20px;
+      box-shadow: 0 2px 14px rgba(0,0,0,0.1);
+      padding: 1.2rem 1.5rem;
+      box-sizing: border-box;
+    }
+    /* Progress Circle */
+    .progress-circle {
       position: relative;
-      padding-left: 50%;
-      text-align: right;
-      font-size: 0.9rem;
+      width: 140px;
+      height: 140px;
+      margin: 0 auto 1rem auto;
     }
-    tbody td::before {
+    .progress-circle svg {
+      transform: rotate(-90deg);
+      width: 140px;
+      height: 140px;
+    }
+    .progress-bg {
+      fill: none;
+      stroke: #e5e5ea;
+      stroke-width: 12;
+    }
+    .progress-bar {
+      fill: none;
+      stroke: #34c759;
+      stroke-width: 12;
+      stroke-linecap: round;
+      stroke-dasharray: 440;
+      stroke-dashoffset: 0; /* Will be set inline */
+      transition: stroke-dashoffset 0.6s ease;
+    }
+    .progress-text {
       position: absolute;
       top: 50%;
-      left: 1rem;
-      width: 45%;
-      padding-right: 0.5rem;
-      white-space: nowrap;
-      font-weight: 600;
-      text-align: left;
-      transform: translateY(-50%);
-      content: attr(data-label);
+      left: 50%;
+      font-weight: 700;
+      font-size: 1.5rem;
+      color: #1c1c1e;
+      transform: translate(-50%, -50%);
+      user-select: none;
     }
-    /* Progress bars and badges remain inline */
-  }
-
-  /* Section containers */
-  section {
-    background: white;
-    padding: 1rem 1.5rem;
-    margin-bottom: 2rem;
-    border-radius: 8px;
-    box-shadow: 0 0 5px rgba(27,31,35,0.1);
-  }
-
-  /* Links */
-  a {
-    color: #0969da;
-    text-decoration: none;
-  }
-  a:hover,
-  a:focus {
-    text-decoration: underline;
-  }
-
-  /* Small notes */
-  .note {
-    font-size: 0.85rem;
-    color: #6a737d;
-    margin-top: -1rem;
-    margin-bottom: 1rem;
-  }
-
-</style>
+    /* Case Table */
+    table {
+      width: 100%;
+      border-collapse: separate;
+      border-spacing: 0 0.5rem;
+    }
+    thead tr {
+      display: none; /* Hidden on mobile iPhone style */
+    }
+    tbody tr {
+      background: #f9fafb;
+      border-radius: 15px;
+      box-shadow: inset 0 0 0 1px #d1d1d6;
+      display: flex;
+      flex-direction: column;
+      padding: 1rem 1rem 0.75rem;
+    }
+    tbody tr + tr {
+      margin-top: 1rem;
+    }
+    tbody td {
+      display: flex;
+      justify-content: space-between;
+      padding: 0.1rem 0;
+      font-size: 0.95rem;
+      font-weight: 500;
+      border: none;
+      color: #3c3c4399;
+    }
+    tbody td:first-child {
+      font-weight: 700;
+      color: #1c1c1e;
+      margin-bottom: 0.3rem;
+      font-size: 1rem;
+    }
+    /* Status badges */
+    .badge {
+      padding: 0.15em 0.7em;
+      border-radius: 14px;
+      font-weight: 600;
+      font-size: 0.85rem;
+      display: inline-block;
+      min-width: 75px;
+      text-align: center;
+      color: white;
+      user-select: none;
+      box-shadow: 0 1px 2px rgba(0,0,0,0.12);
+    }
+    .badge-open { background-color: #ff3b30; }       /* red */
+    .badge-pending { background-color: #ff9500; }    /* orange */
+    .badge-resolved { background-color: #34c759; }   /* green */
+    .badge-closed { background-color: #8e8e93; }     /* gray */
+    .badge-overdue { background-color: #ff453a; }
+    .badge-followup { background-color: #0a84ff; }   /* blue */
+    .badge-top-performer { background-color: #fbcf3f; color: #3c3c43; }
+    /* Follow up checkbox */
+    .checkbox {
+      margin: 0 0.5rem 0 0;
+      accent-color: #0a84ff;
+      cursor: default;
+    }
+    /* Section titles & small note */
+    .note {
+      font-size: 0.8rem;
+      color: #6e6e73;
+      margin-top: 0.5rem;
+    }
+    /* Case breakdown */
+    .case-breakdown {
+      display: grid;
+      grid-template-columns: 1fr 100px;
+      gap: 0.5rem 1rem;
+      margin-top: 0.5rem;
+    }
+    .case-breakdown-label {
+      font-weight: 600;
+      font-size: 1rem;
+      color: #1c1c1e;
+      align-self: center;
+    }
+    .bar-wrapper {
+      background: #e5e5ea;
+      border-radius: 14px;
+      height: 18px;
+      overflow: hidden;
+      position: relative;
+      box-shadow: inset 0 1px 2px rgba(0,0,0,0.1);
+    }
+    .bar-fill {
+      height: 100%;
+      background: #34c759;
+      border-radius: 14px 0 0 14px;
+      transition: width 0.3s ease;
+    }
+    /* Officer Performance */
+    .performance-table {
+      width: 100%;
+      border-collapse: separate;
+      border-spacing: 0 1rem;
+    }
+    .performance-table thead tr {
+      background: transparent;
+      display: flex;
+      font-weight: 700;
+      font-size: 0.95rem;
+      color: #1c1c1e;
+      padding-bottom: 0.3rem;
+      border-bottom: 2px solid #c7c7cc;
+      margin-bottom: 0.75rem;
+    }
+    .performance-table tbody tr {
+      display: flex;
+      background: #f9fafb;
+      border-radius: 15px;
+      padding: 0.5rem 1rem;
+      align-items: center;
+      box-shadow: inset 0 0 0 1px #d1d1d6;
+      font-weight: 600;
+      font-size: 0.9rem;
+      color: #3c3c43;
+    }
+    .performance-table th, .performance-table td {
+      flex: 1;
+      text-align: left;
+    }
+    .performance-table td.efficiency {
+      flex: 2;
+      display: flex;
+      align-items: center;
+      gap: 0.6rem;
+    }
+    .performance-bar {
+      flex-grow: 1;
+      height: 12px;
+      background: #e5e5ea;
+      border-radius: 14px;
+      overflow: hidden;
+      box-shadow: inset 0 1px 2px rgba(0,0,0,0.1);
+    }
+    .performance-bar-fill {
+      background: #0a84ff;
+      height: 100%;
+      border-radius: 14px 0 0 14px;
+      transition: width 0.3s ease;
+    }
+    /* File links */
+    .file-list {
+      list-style: none;
+      padding-left: 0;
+      margin: 0;
+    }
+    .file-list li {
+      margin-bottom: 0.8rem;
+      font-weight: 600;
+    }
+    .file-list a {
+      color: #0a84ff;
+      text-decoration: none;
+    }
+    .file-list a:hover,
+    .file-list a:focus {
+      text-decoration: underline;
+    }
+    /* Follow-up table */
+    .followup-table {
+      width: 100%;
+      border-collapse: separate;
+      border-spacing: 0 0.8rem;
+    }
+    .followup-table thead tr {
+      display: flex;
+      font-weight: 700;
+      font-size: 0.95rem;
+      border-bottom: 2px solid #c7c7cc;
+      margin-bottom: 0.5rem;
+      color: #1c1c1e;
+    }
+    .followup-table tbody tr {
+      display: flex;
+      background: #f9fafb;
+      border-radius: 15px;
+      box-shadow: inset 0 0 0 1px #d1d1d6;
+      padding: 0.5rem 1rem;
+      font-weight: 600;
+      font-size: 0.9rem;
+      color: #3c3c43;
+      align-items: center;
+    }
+    .followup-table th,
+    .followup-table td {
+      flex: 1;
+      text-align: left;
+    }
+    /* Summary */
+    .summary-table {
+      width: 100%;
+      border-collapse: collapse;
+      font-weight: 600;
+      font-size: 1rem;
+      color: #1c1c1e;
+    }
+    .summary-table th, .summary-table td {
+      padding: 0.5rem 0.75rem;
+      border-bottom: 1px solid #d1d1da;
+      text-align: left;
+    }
+    .summary-table th {
+      width: 50%;
+      font-weight: 700;
+    }
+    .summary-badge {
+      background: #fbcf3f;
+      color: #3c3c43;
+      padding: 0.3em 0.6em;
+      border-radius: 15px;
+      font-weight: 700;
+      display: inline-block;
+      box-shadow: 0 1px 2px rgba(0,0,0,0.12);
+    }
+    /* Buttons - placeholders for future JS actions */
+    button {
+      background: #0a84ff;
+      color: white;
+      border: none;
+      border-radius: 14px;
+      padding: 0.6rem 1.2rem;
+      font-weight: 600;
+      font-size: 1rem;
+      box-shadow: 0 2px 10px rgb(10 132 255 / 0.4);
+      cursor: pointer;
+      user-select: none;
+      transition: background 0.3s ease;
+      margin-top: 1rem;
+      width: 100%;
+    }
+    button:hover,
+    button:focus {
+      background: #0066ff;
+      outline: none;
+    }
+    /* Responsive */
+    @media (min-width: 600px) {
+      tbody tr {
+        display: table-row;
+        background: white;
+        box-shadow: none;
+        border-radius: 0;
+        padding: 0;
+      }
+      thead tr {
+        display: table-row;
+      }
+      tbody td {
+        padding: 0.75rem 1rem;
+        display: table-cell;
+        color: #24292e;
+        font-weight: 400;
+        border-bottom: 1px solid #d1d5da;
+      }
+      tbody td:first-child {
+        font-weight: 600;
+        color: #24292e;
+      }
+      /* Flex based performance table to normal */
+      .performance-table, .followup-table {
+        display: table;
+      }
+      .performance-table thead tr, .followup-table thead tr,
+      .performance-table tbody tr, .followup-table tbody tr {
+        display: table-row;
+      }
+      .performance-table th, .followup-table th,
+      .performance-table td, .followup-table td {
+        display: table-cell;
+        padding: 0.5rem 1rem;
+        color: #24292e;
+        font-weight: 400;
+        text-align: left;
+      }
+      .performance-table td.efficiency {
+        display: flex;
+        align-items: center;
+        gap: 0.6rem;
+      }
+      .performance-bar {
+        flex-grow: 1;
+        height: 12px;
+        margin-left: 0.5rem;
+      }
+      /* File list as table */
+      .file-list {
+        display: table;
+        width: 100%;
+      }
+      .file-list li {
+        display: table-row;
+        font-weight: 400;
+      }
+      .file-list li > a {
+        display: table-cell;
+        padding: 0.5rem 1rem;
+      }
+    }
+  </style>
 </head>
 <body>
 
 <header>
-  <h1>🕵️ Internal Affairs Case Tracking Dashboard</h1>
-  <p class="note">Manual updates required. Use comments & placeholders below for guidance.</p>
+  <h1>🕵️ Internal Affairs Case Tracker</h1>
+  <p style="text-align:center; color:#6e6e73; font-size:0.85rem;">iPhone-style clean dashboard — manual updates only (no JS)</p>
 </header>
 
-<section aria-labelledby="progress-overview">
-  <h2 id="progress-overview">📊 Progress Overview</h2>
+<section aria-labelledby="progress">
+  <h2 id="progress">📊 Progress Overview</h2>
   <!--
-    Replace the values in data-completed and data-total below to update progress.
-    For example, data-completed="14" data-total="20"
+    Update stroke-dashoffset inline style on .progress-bar to (440 * (1 - completed/total))
+    Example: completed=14, total=20 → offset = 440 * (1 - 14/20) = 132
   -->
-  <p><strong>Completed Cases:</strong> <span id="completed-count">14</span> / <span id="total-count">20</span></p>
-  <div class="progress-container" role="progressbar" aria-valuemin="0" aria-valuemax="20" aria-valuenow="14" aria-label="Case Completion Progress">
-    <div class="progress-bar" style="width: 70%;"></div>
+  <div class="progress-circle" role="progressbar" aria-valuemin="0" aria-valuemax="20" aria-valuenow="14" aria-label="Cases completion progress">
+    <svg viewBox="0 0 140 140" aria-hidden="true" focusable="false">
+      <circle class="progress-bg" cx="70" cy="70" r="70" />
+      <circle class="progress-bar" cx="70" cy="70" r="70" style="stroke-dashoffset: 132;" />
+    </svg>
+    <div class="progress-text" aria-live="polite">14 / 20</div>
   </div>
-  <p class="note">Update <code>completed-count</code> and <code>total-count</code> values, and adjust <code>width</code> of progress-bar style accordingly.</p>
+  <p class="note">Update progress-circle stroke offset and text to reflect current progress.</p>
 </section>
 
-<section aria-labelledby="case-listing">
-  <h2 id="case-listing">🗂️ Case Listing</h2>
-  <table role="table" aria-describedby="case-listing-desc" summary="Listing of internal affairs cases with their details">
-    <caption id="case-listing-desc" class="sr-only">Table of cases including Case ID, Type, Status, Assigned Officer, Due Date, Follow-up and Overdue Alerts</caption>
-    <thead>
-      <tr>
-        <th scope="col" tabindex="0">Case ID</th>
-        <th scope="col" tabindex="0">Type</th>
-        <th scope="col" tabindex="0">Status</th>
-        <th scope="col" tabindex="0">Assigned Officer</th>
-        <th scope="col" tabindex="0">Due Date</th>
-        <th scope="col" tabindex="0">Follow-up Needed</th>
-        <th scope="col" tabindex="0">Overdue Alert</th>
-      </tr>
-    </thead>
-    <tbody>
-      <!-- Replace or add rows here -->
-      <tr>
-        <td data-label="Case ID">IA-001</td>
-        <td data-label="Type">Abuse of Power</td>
-        <td data-label="Status"><span class="badge badge-open" aria-label="Open status">🔴 Open</span></td>
-        <td data-label="Assigned Officer">Officer Jane Doe</td>
-        <td data-label="Due Date">2025-07-10</td>
-        <td data-label="Follow-up Needed"><input type="checkbox" aria-label="Follow-up needed for IA-001" disabled></td>
-        <td data-label="Overdue Alert"><span aria-label="No overdue" role="img">❌</span></td>
-      </tr>
-      <tr>
-        <td data-label="Case ID">IA-002</td>
-        <td data-label="Type">Misconduct</td>
-        <td data-label="Status"><span class="badge badge-closed" aria-label="Closed status">✅ Closed</span></td>
-        <td data-label="Assigned Officer">Officer John Smith</td>
-        <td data-label="Due Date">2025-06-28</td>
-        <td data-label="Follow-up Needed"><input type="checkbox" aria-label="Follow-up needed for IA-002" checked disabled></td>
-        <td data-label="Overdue Alert"><span aria-label="No overdue" role="img">❌</span></td>
-      </tr>
-      <tr>
-        <td data-label="Case ID">IA-003</td>
-        <td data-label="Type">Corruption</td>
-        <td data-label="Status"><span class="badge badge-pending" aria-label="Pending status">🟡 Pending</span></td>
-        <td data-label="Assigned Officer">Officer Alice Lee</td>
-        <td data-label="Due Date">2025-07-05</td>
-        <td data-label="Follow-up Needed"><input type="checkbox" aria-label="Follow-up needed for IA-003" checked disabled></td>
-        <td data-label="Overdue Alert"><span class="badge badge-overdue" aria-label="Overdue case">⚠️ Yes</span></td>
-      </tr>
-      <tr>
-        <td data-label="Case ID">IA-004</td>
-        <td data-label="Type">Abuse of Power</td>
-        <td data-label="Status"><span class="badge badge-resolved" aria-label="Resolved status">🟢 Resolved</span></td>
-        <td data-label="Assigned Officer">Officer Jane Doe</td>
-        <td data-label="Due Date">2025-06-30</td>
-        <td data-label="Follow-up Needed"><input type="checkbox" aria-label="Follow-up needed for IA-004" disabled></td>
-        <td data-label="Overdue Alert"><span aria-label="No overdue" role="img">❌</span></td>
-      </tr>
-    </tbody>
-  </table>
-  <p class="note">Update rows as cases progress or new cases are added.</p>
+<section aria-labelledby="cases">
+  <h2 id="cases">🗂️ Cases</h2>
+  <!-- 
+    Using <details> and <summary> for tappable expand/collapse per case (mobile friendly)
+    Can add "Add new case" button below as placeholder for future JS or manual editing instructions
+  -->
+  <details open>
+    <summary>
+      <strong>IA-001</strong> - Abuse of Power
+      <span class="badge badge-open" aria-label="Open status">🔴 Open</span>
+    </summary>
+    <div style="padding: 0.8rem 0 0 0;">
+      <p><strong>Assigned Officer:</strong> Officer Jane Doe</p>
+      <p><strong>Due Date:</strong> 2025-07-10</p>
+      <p><strong>Follow-up Needed:</strong> <input type="checkbox" checked disabled class="checkbox" aria-label="Follow-up needed for IA-001"></p>
+      <p><strong>Overdue Alert:</strong> <span class="badge badge-overdue">⚠️ Yes</span></p>
+      <p><strong>Notes:</strong> Awaiting witness statement</p>
+      <p><strong>Files:</strong> <a href="./files/Transcript_IA001.pdf" target="_blank" rel="noopener noreferrer">Transcript_IA001.pdf</a></p>
+    </div>
+  </details>
+  <details>
+    <summary>
+      <strong>IA-002</strong> - Misconduct
+      <span class="badge badge-closed" aria-label="Closed status">✅ Closed</span>
+    </summary>
+    <div style="padding: 0.8rem 0 0 0;">
+      <p><strong>Assigned Officer:</strong> Officer John Smith</p>
+      <p><strong>Due Date:</strong> 2025-06-28</p>
+      <p><strong>Follow-up Needed:</strong> <input type="checkbox" disabled class="checkbox" aria-label="No follow-up for IA-002"></p>
+      <p><strong>Overdue Alert:</strong> ❌ No</p>
+      <p><strong>Files:</strong> <a href="./files/Evidence_IA002.zip" target="_blank" rel="noopener noreferrer">Evidence_IA002.zip</a></p>
+    </div>
+  </details>
+  <details>
+    <summary>
+      <strong>IA-003</strong> - Corruption
+      <span class="badge badge-pending" aria-label="Pending status">🟡 Pending</span>
+    </summary>
+    <div style="padding: 0.8rem 0 0 0;">
+      <p><strong>Assigned Officer:</strong> Officer Alice Chen</p>
+      <p><strong>Due Date:</strong> 2025-07-12</p>
+      <p><strong>Follow-up Needed:</strong> <input type="checkbox" checked disabled class="checkbox" aria-label="Follow-up needed for IA-003"></p>
+      <p><strong>Overdue Alert:</strong> ❌ No</p>
+      <p><strong>Notes:</strong> Officer report pending</p>
+      <p><strong>Files:</strong> <a href="./files/Transcript_IA003.pdf" target="_blank" rel="noopener noreferrer">Transcript_IA003.pdf</a></p>
+    </div>
+  </details>
+  <button aria-label="Add new case">＋ Add New Case (manual edit)</button>
+  <p class="note">Cases listed above. Use &lt;details&gt; to expand each case details.</p>
 </section>
 
-<section aria-labelledby="case-type-breakdown">
-  <h2 id="case-type-breakdown">📈 Case Type Breakdown</h2>
-  <ul style="list-style: none; padding-left: 0;">
-    <!-- Adjust counts and widths accordingly -->
-    <li><strong>Abuse of Power</strong>: 5
-      <span class="case-type-bar" aria-label="Abuse of Power case count">
-        <span class="case-type-bar-fill" style="width: 50%;"></span>
-      </span>
-    </li>
-    <li><strong>Misconduct</strong>: 3
-      <span class="case-type-bar" aria-label="Misconduct case count">
-        <span class="case-type-bar-fill" style="width: 30%;"></span>
-      </span>
-    </li>
-    <li><strong>Corruption</strong>: 2
-      <span class="case-type-bar" aria-label="Corruption case count">
-        <span class="case-type-bar-fill" style="width: 20%;"></span>
-      </span>
-    </li>
-    <li><strong>Harassment</strong>: 1
-      <span class="case-type-bar" aria-label="Harassment case count">
-        <span class="case-type-bar-fill" style="width: 10%;"></span>
-      </span>
-    </li>
-  </ul>
-  <p class="note">Adjust bar widths (max 100%) to represent relative case counts.</p>
+<section aria-labelledby="case-breakdown">
+  <h2 id="case-breakdown">📈 Case Breakdown by Type</h2>
+  <div class="case-breakdown" role="list">
+    <!-- Update bar widths inline style for each .bar-fill -->
+    <div class="case-breakdown-label" role="listitem">Abuse of Power</div>
+    <div class="bar-wrapper" role="listitem" aria-label="Abuse of Power case count">
+      <div class="bar-fill" style="width: 70%;"></div>
+    </div>
+
+    <div class="case-breakdown-label" role="listitem">Misconduct</div>
+    <div class="bar-wrapper" role="listitem" aria-label="Misconduct case count">
+      <div class="bar-fill" style="width: 40%; background: #ff9500;"></div>
+    </div>
+
+    <div class="case-breakdown-label" role="listitem">Corruption</div>
+    <div class="bar-wrapper" role="listitem" aria-label="Corruption case count">
+      <div class="bar-fill" style="width: 30%; background: #ff3b30;"></div>
+    </div>
+
+    <div class="case-breakdown-label" role="listitem">Other</div>
+    <div class="bar-wrapper" role="listitem" aria-label="Other case count">
+      <div class="bar-fill" style="width: 15%; background: #8e8e93;"></div>
+    </div>
+  </div>
+  <p class="note">Adjust bar widths and colors to match your current case distribution.</p>
 </section>
 
 <section aria-labelledby="officer-performance">
   <h2 id="officer-performance">👮 Officer Performance</h2>
-  <table role="table" aria-describedby="officer-performance-desc" summary="Performance of officers based on assigned and completed cases">
-    <caption id="officer-performance-desc" class="sr-only">Table of officers showing assigned cases, completed cases, and efficiency percentages</caption>
+  <table class="performance-table" role="table" aria-describedby="performance-desc">
+    <caption id="performance-desc" class="sr-only">Table of officers with assigned, completed tasks and efficiency rating</caption>
     <thead>
       <tr>
-        <th scope="col">Officer Name</th>
-        <th scope="col">Assigned Cases</th>
-        <th scope="col">Completed Cases</th>
+        <th scope="col">Officer</th>
+        <th scope="col">Assigned</th>
+        <th scope="col">Completed</th>
         <th scope="col">Efficiency</th>
       </tr>
     </thead>
     <tbody>
-      <!-- Update rows as needed -->
       <tr>
-        <td data-label="Officer Name">Jane Doe</td>
-        <td data-label="Assigned Cases">8</td>
-        <td data-label="Completed Cases">6</td>
-        <td data-label="Efficiency">
-          75%
-          <span class="performance-bar" aria-label="Efficiency progress bar for Jane Doe">
-            <span class="performance-bar-fill" style="width: 75%;"></span>
-          </span>
-          <span aria-hidden="true">✅</span>
+        <td>Jane Doe</td>
+        <td>8</td>
+        <td>6</td>
+        <td class="efficiency" aria-label="Efficiency 75%">
+          <span>75%</span>
+          <div class="performance-bar" aria-hidden="true">
+            <div class="performance-bar-fill" style="width: 75%;"></div>
+          </div>
         </td>
       </tr>
       <tr>
-        <td data-label="Officer Name">John Smith</td>
-        <td data-label="Assigned Cases">5</td>
-        <td data-label="Completed Cases">5</td>
-        <td data-label="Efficiency">
-          100%
-          <span class="performance-bar" aria-label="Efficiency progress bar for John Smith">
-            <span class="performance-bar-fill" style="width: 100%;"></span>
-          </span>
-          <span aria-hidden="true">🏆</span>
+        <td>John Smith</td>
+        <td>7</td>
+        <td>7</td>
+        <td class="efficiency" aria-label="Efficiency 100%">
+          <span>100%</span>
+          <div class="performance-bar" aria-hidden="true">
+            <div class="performance-bar-fill" style="width: 100%;"></div>
+          </div>
         </td>
       </tr>
       <tr>
-        <td data-label="Officer Name">Alice Lee</td>
-        <td data-label="Assigned Cases">4</td>
-        <td data-label="Completed Cases">3</td>
-        <td data-label="Efficiency">
-          75%
-          <span class="performance-bar" aria-label="Efficiency progress bar for Alice Lee">
-            <span class="performance-bar-fill" style="width: 75%;"></span>
-          </span>
-          <span aria-hidden="true">✅</span>
-        </td>
-      </tr>
-      <tr>
-        <td data-label="Officer Name">Michael Brown</td>
-        <td data-label="Assigned Cases">3</td>
-        <td data-label="Completed Cases">1</td>
-        <td data-label="Efficiency">
-          33%
-          <span class="performance-bar" aria-label="Efficiency progress bar for Michael Brown">
-            <span class="performance-bar-fill" style="width: 33%;"></span>
-          </span>
-          <span aria-hidden="true">⚠️</span>
+        <td>Alice Chen</td>
+        <td>5</td>
+        <td>3</td>
+        <td class="efficiency" aria-label="Efficiency 60%">
+          <span>60%</span>
+          <div class="performance-bar" aria-hidden="true">
+            <div class="performance-bar-fill" style="width: 60%;"></div>
+          </div>
         </td>
       </tr>
     </tbody>
   </table>
-  <p class="note">Update efficiency as (Completed / Assigned) * 100% and adjust bar widths.</p>
+  <p class="note">Update efficiency bars and numbers monthly.</p>
 </section>
 
 <section aria-labelledby="file-attachments">
-  <h2 id="file-attachments">📎 File Attachments / Links</h2>
-  <table role="table" aria-describedby="file-attachments-desc" summary="List of case-related files and links">
-    <caption id="file-attachments-desc" class="sr-only">Table listing case files and relevant links for transcripts and evidence</caption>
-    <thead>
-      <tr>
-        <th scope="col">Case ID</th>
-        <th scope="col">Description</th>
-        <th scope="col">Link / File Name</th>
-      </tr>
-    </thead>
-    <tbody>
-      <!-- Add or update rows -->
-      <tr>
-        <td data-label="Case ID">IA-001</td>
-        <td data-label="Description">Interview Transcript</td>
-        <td data-label="Link"><a href="./files/Transcript_IA001.pdf" target="_blank" rel="noopener noreferrer">Transcript_IA001.pdf</a></td>
-      </tr>
-      <tr>
-        <td data-label="Case ID">IA-002</td>
-        <td data-label="Description">Evidence Photos</td>
-        <td data-label="Link"><a href="./files/Evidence_IA002.zip" target="_blank" rel="noopener noreferrer">Evidence_IA002.zip</a></td>
-      </tr>
-      <tr>
-        <td data-label="Case ID">IA-003</td>
-        <td data-label="Description">Witness Statement</td>
-        <td data-label="Link"><a href="./files/Witness_IA003.docx" target="_blank" rel="noopener noreferrer">Witness_IA003.docx</a></td>
-      </tr>
-    </tbody>
-  </table>
-  <p class="note">Update links and file names as needed to reflect actual file storage paths.</p>
+  <h2 id="file-attachments">📎 File Attachments</h2>
+  <ul class="file-list">
+    <!-- Add new files as list items -->
+    <li><a href="./files/Transcript_IA001.pdf" target="_blank" rel="noopener noreferrer">Transcript for IA-001</a></li>
+    <li><a href="./files/Evidence_IA002.zip" target="_blank" rel="noopener noreferrer">Evidence Archive for IA-002</a></li>
+    <li><a href="./files/Transcript_IA003.pdf" target="_blank" rel="noopener noreferrer">Transcript for IA-003</a></li>
+  </ul>
+  <p class="note">Add or remove files as needed, updating links accordingly.</p>
 </section>
 
 <section aria-labelledby="followup-overdue">
-  <h2 id="followup-overdue">🚩 Follow-up Flags & Overdue Alerts</h2>
-  <table role="table" aria-describedby="followup-overdue-desc" summary="Table showing cases flagged for follow-up or overdue">
-    <caption id="followup-overdue-desc" class="sr-only">Table of cases requiring follow-up or overdue alerts</caption>
+  <h2 id="followup-overdue">⚠️ Follow-ups & Overdue Cases</h2>
+  <table class="followup-table" role="table" aria-describedby="followup-desc">
+    <caption id="followup-desc" class="sr-only">Table of cases requiring follow-up or overdue alerts</caption>
     <thead>
       <tr>
         <th scope="col">Case ID</th>
-        <th scope="col">Follow-up Required</th>
+        <th scope="col">Follow-up</th>
         <th scope="col">Days Overdue</th>
         <th scope="col">Notes</th>
       </tr>
     </thead>
     <tbody>
-      <!-- Add or update -->
       <tr>
-        <td data-label="Case ID">IA-003</td>
-        <td data-label="Follow-up Required">✅ Yes</td>
-        <td data-label="Days Overdue">3</td>
-        <td data-label="Notes">Awaiting witness statement</td>
+        <td>IA-003</td>
+        <td><input type="checkbox" checked disabled class="checkbox" aria-label="Follow-up needed for IA-003" /></td>
+        <td>3</td>
+        <td>Awaiting witness statement</td>
       </tr>
       <tr>
-        <td data-label="Case ID">IA-005</td>
-        <td data-label="Follow-up Required">✅ Yes</td>
-        <td data-label="Days Overdue">7</td>
-        <td data-label="Notes">Officer report pending</td>
+        <td>IA-005</td>
+        <td><input type="checkbox" checked disabled class="checkbox" aria-label="Follow-up needed for IA-005" /></td>
+        <td>7</td>
+        <td>Officer report pending</td>
       </tr>
     </tbody>
   </table>
-  <p class="note">Keep this section updated to prioritize urgent cases.</p>
+  <p class="note">Update overdue days and notes as cases progress.</p>
 </section>
 
-<section aria-labelledby="end-of-month-summary">
-  <h2 id="end-of-month-summary">📅 End-of-Month Summary — <time datetime="2025-07">July 2025</time></h2>
-  <table role="table" aria-describedby="summary-desc" summary="Summary statistics for the month">
-    <caption id="summary-desc" class="sr-only">Summary of total cases, resolved, ongoing, average resolution time and top performers</caption>
+<section aria-labelledby="summary">
+  <h2 id="summary">📅 End-of-Month Summary — <time datetime="2025-07">July 2025</time></h2>
+  <table class="summary-table" role="table" aria-describedby="summary-desc">
+    <caption id="summary-desc" class="sr-only">Summary of key statistics for the month</caption>
     <tbody>
       <tr>
         <th scope="row">Total Cases</th>
         <td>20</td>
-        <td>Cases opened this month</td>
       </tr>
       <tr>
         <th scope="row">Resolved Cases</th>
         <td>14</td>
-        <td>Cases successfully closed</td>
       </tr>
       <tr>
         <th scope="row">Ongoing Cases</th>
         <td>6</td>
-        <td>Cases still under investigation</td>
       </tr>
       <tr>
         <th scope="row">Average Resolution Time</th>
         <td>12 days</td>
-        <td>Average from open to close</td>
       </tr>
       <tr>
         <th scope="row">Top Performers</th>
-        <td colspan="2" class="badge badge-top-performer" style="font-weight: 600;">
-          John Smith 🏆, Jane Doe ✅
-        </td>
+        <td><span class="summary-badge" aria-label="Top performer badge">John Smith 🏆, Jane Doe ✅</span></td>
       </tr>
     </tbody>
   </table>
-  <p class="note">Update summary stats monthly.</p>
+  <p class="note">Update this summary at the end of each month.</p>
 </section>
 
-<footer style="text-align:center; font-size: 0.85rem; color: #6a737d;">
+<footer style="text-align:center; color:#8e8e93; font-size: 0.85rem; margin-top: 3rem;">
+  <p>Template designed for smooth iPhone-like UX.</p>
   <p>
-    Template created for <strong>Internal Affairs</strong> tracking.<br />
-    To extend with automation, consider GitHub Actions that update this HTML by parsing issues, labels, and projects.
+    Consider GitHub Actions for automation:<br />
+    - Parse GitHub Issues & Labels to update case lists.<br />
+    - Regenerate this file periodically.<br />
+    - Trigger notifications on overdue/follow-up cases.
   </p>
   <p style="font-style: italic;">Last updated: <time datetime="2025-07-05">July 5, 2025</time></p>
 </footer>
 
 <!--
-  Instructions for maintenance and automation:
+  Instructions for maintenance:
 
-  1. Manual edits:
-     - Update progress counts & bar widths in the "Progress Overview" section.
-     - Add or modify case rows in the "Case Listing" table.
-     - Update case type counts and bar widths in the breakdown list.
-     - Adjust officer stats and efficiency bars in "Officer Performance."
-     - Add or remove files & links in the "File Attachments" section.
-     - Mark follow-ups and overdue alerts as needed.
-     - Update summary statistics at month-end.
+  - Update the progress circle stroke-dashoffset and progress text manually.
+  - Add or edit <details> blocks inside Cases section for new or updated cases.
+  - Modify bar-fill widths and colors in Case Breakdown to reflect current stats.
+  - Update officer performance table with new numbers and adjust efficiency bars.
+  - Add or remove file links in File Attachments.
+  - Mark follow-ups and update overdue info in the Follow-ups table.
+  - Update End-of-Month Summary as needed.
 
-  2. Automation ideas with GitHub Actions:
-     - Parse GitHub issues labeled as cases to update counts & tables automatically.
-     - Generate or replace this HTML file periodically.
-     - Extract data from GitHub Projects or Issues API.
-     - Notify team on overdue or flagged cases via issue comments or PRs.
+  Potential enhancements with JavaScript or GitHub Actions:
 
-  Note: Without JavaScript, sorting or dynamic filtering must be done externally or manually.
-
+  - JS: Add sorting, filtering, and dynamic case creation.
+  - GitHub Actions: Pull issue data from GitHub API, generate updated HTML automatically.
 -->
 
 </body>
